@@ -1,22 +1,19 @@
-import { type Config } from 'tailwindcss'
-import animatePlugin from 'tailwindcss-animate'
-import radixPlugin from 'tailwindcss-radix'
-import { marketingPreset } from './app/routes/_marketing+/tailwind-preset'
-import { extendedTheme } from './app/utils/extended-theme.ts'
+import type { Config } from 'tailwindcss';
 
-export default {
-	content: ['./app/**/*.{ts,tsx,jsx,js}'],
-	darkMode: 'class',
-	theme: {
-		container: {
-			center: true,
-			padding: '2rem',
-			screens: {
-				'2xl': '1400px',
-			},
-		},
-		extend: extendedTheme,
-	},
-	presets: [marketingPreset],
-	plugins: [animatePlugin, radixPlugin],
-} satisfies Config
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
