@@ -2,7 +2,7 @@ name: 🚀 Deploy
 on:
   push:
     branches:
-      - main
+      - staging
   pull_request: {}
 
 concurrency:
@@ -68,9 +68,6 @@ jobs:
   #     - name: 🏄 Copy test env vars
   #       run: cp .env.example .env
 
-  #     - name: 🖼 Build icons
-  #       run: npm run build:icons
-
   #     - name: ⚡ Run vitest
   #       run: npm run test -- --coverage
 
@@ -78,9 +75,9 @@ jobs:
     name: 🚀 Deploy
     runs-on: ubuntu-22.04
     needs: [lint, typecheck]
-    # only build/deploy main branch on pushes
+    # only build/deploy staging branch on pushes
     if:
-      ${{ (github.ref == 'refs/heads/main') &&
+      ${{ (github.ref == 'refs/heads/staging') &&
       github.event_name == 'push' }}
 
     steps:
@@ -97,8 +94,11 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@v1.4
 
-      - name: 🚀 Deploy Production
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+      - name: 🚀 Deploy Staging
+        if: ${{ github.ref == 'refs/heads/staging' }}
+        run:
+          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+          --app ${{ steps.app_name.outputs.value }}-staging
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
