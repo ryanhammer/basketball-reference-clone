@@ -1,5 +1,10 @@
-app = "basketball-reference-clone-9671"
-primary_region = "ewr"
+# fly.toml app configuration file generated for basketball-reference-clone on 2024-02-22T09:40:15-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'basketball-reference-clone'
+primary_region = 'ewr'
 
 [build]
 
