@@ -8,52 +8,53 @@ datasource db {
 }
 
 model League {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  abbreviation String   @unique
-  isActive     Boolean  @map("is_active")
-  yearCreated  Int      @map("year_created")
-  yearDefunct  Int?     @map("year_defunct")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  name            String   @unique
+  abbreviation    String   @unique
+  isActive        Boolean  @map("is_active")
+  inauguralSeason String   @map("inaugural_season")
+  finalSeason     String?  @map("final_season")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  Franchises Franchise[]
-  Seasons    Season[]
+  franchises Franchise[]
+  seasons    Season[]
 
   @@map("league")
 }
 
 model Franchise {
-  id           String   @id @default(cuid())
-  name         String
-  abbreviation String
-  leagueId     String   @map("league_id")
-  isActive     Boolean  @map("is_active")
-  yearCreated  Int      @map("year_created")
-  yearDefunct  Int?     @map("year_defunct")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  name            String
+  abbreviation    String
+  leagueId        String   @map("league_id")
+  isActive        Boolean  @map("is_active")
+  inauguralSeason String   @map("inaugural_season")
+  finalSeason     String?  @map("final_season")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   league League @relation(fields: [leagueId], references: [id])
-  Teams  Team[]
+  teams  Team[]
 
   @@map("franchise")
 }
 
 model Team {
-  id           String   @id @default(cuid())
-  name         String
-  abbreviation String
-  franchiseId  String   @map("franchise_id")
-  isActive     Boolean  @map("is_active")
-  yearCreated  Int      @map("year_created")
-  yearDefunct  Int?     @map("year_defunct")
-  externalId   String?  @map("external_id")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  name            String
+  abbreviation    String
+  franchiseId     String   @map("franchise_id")
+  isActive        Boolean  @map("is_active")
+  inauguralSeason String   @map("inaugural_season")
+  finalSeason     String?  @map("final_season")
+  externalId      String?  @map("external_id")
+  league          String
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   franchise   Franchise    @relation(fields: [franchiseId], references: [id])
-  TeamSeasons TeamSeason[]
+  teamSeasons TeamSeason[]
 
   @@map("team")
 }
@@ -64,7 +65,7 @@ model Player {
   firstName      String    @map("first_name")
   middleName     String?   @map("middle_name")
   lastName       String    @map("last_name")
-  birthDate      DateTime  @map("birth_date")
+  birthDate      String    @map("birth_date")
   birthCity      String    @map("birth_city")
   birthState     String?   @map("birth_state")
   birthCountry   String    @map("birth_country")
@@ -83,21 +84,31 @@ model Player {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  PlayerSeasons PlayerSeason[]
-  PlayerGames   PlayerGame[]
+  playerSeasons PlayerSeason[]
+  playerGames   PlayerGame[]
 
   @@map("player")
 }
 
+enum SeasonType {
+  REG // Regular Season
+  IST // In-Season Tournament but non regular season game
+  PST // Postseason
+  PRE // Preseason
+  PIT // Play-In Tournament
+}
+
 model Season {
-  id         String   @id @default(cuid())
-  startYear  Int      @map("start_year")
-  endYear    Int      @map("end_year")
-  leagueId   String   @map("league_id")
-  isCurrent  Boolean  @map("is_current")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  externalId String?  @map("external_id")
+  id         String     @id @default(cuid())
+  year       Int
+  startDate  String     @map("start_date")
+  endDate    String     @map("end_date")
+  leagueId   String     @map("league_id")
+  isCurrent  Boolean    @map("is_current")
+  type       SeasonType
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  externalId String?    @map("external_id")
 
   league        League         @relation(fields: [leagueId], references: [id])
   teamSeasons   TeamSeason[]
@@ -152,8 +163,8 @@ model TeamSeason {
   season          Season         @relation(fields: [seasonId], references: [id])
   homeGames       Game[]         @relation("HomeTeam")
   awayGames       Game[]         @relation("AwayTeam")
-  TeamSeasonGames TeamGame[]
-  PlayerSeasons   PlayerSeason[]
+  teamSeasonGames TeamGame[]
+  playerSeasons   PlayerSeason[]
   venue           Venue          @relation(fields: [venueId], references: [id])
 
   @@map("team_season")
@@ -172,8 +183,8 @@ model Venue {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  Games       Game[]
-  TeamSeasons TeamSeason[]
+  games       Game[]
+  teamSeasons TeamSeason[]
 
   @@map("venue")
 }
@@ -205,13 +216,13 @@ model Game {
   updatedAt        DateTime @updatedAt @map("updated_at")
   notes            String?
 
-  Season        Season         @relation(fields: [seasonId], references: [id])
+  season        Season         @relation(fields: [seasonId], references: [id])
   homeTeam      TeamSeason     @relation(name: "HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam      TeamSeason     @relation(name: "AwayTeam", fields: [awayTeamId], references: [id])
   venue         Venue          @relation(fields: [venueId], references: [id])
-  TeamGames     TeamGame[]
-  PlayerGames   PlayerGame[]
-  OfficialGames OfficialGame[]
+  teamGames     TeamGame[]
+  playerGames   PlayerGame[]
+  officialGames OfficialGame[]
 
   @@map("game")
 }
@@ -258,8 +269,10 @@ model PlayerSeason {
   playerId             String   @map("player_id")
   teamSeasonId         String   @map("team_season_id")
   seasonId             String   @map("season_id")
-  gamesPlayed          Int      @map("games_played")
-  gamesStarted         Int      @map("games_started")
+  gamesPlayed          Int      @default(0) @map("games_played")
+  gamesStarted         Int      @default(0) @map("games_started")
+  isTwoWayContract     Boolean  @map("is_two_way_contract")
+  jerseyNumbers        Int[]    @map("jersey_number")
   points               Int      @default(0)
   secondsPlayed        Int      @default(0) @map("seconds_played")
   fieldGoals           Int      @default(0) @map("field_goals")
@@ -287,7 +300,7 @@ model PlayerSeason {
   player      Player       @relation(fields: [playerId], references: [id])
   teamSeason  TeamSeason   @relation(fields: [teamSeasonId], references: [id])
   season      Season       @relation(fields: [seasonId], references: [id])
-  PlayerGames PlayerGame[]
+  playerGames PlayerGame[]
 
   @@map("player_season")
 }
@@ -335,7 +348,7 @@ model Official {
   updatedAt  DateTime @updatedAt @map("updated_at")
   externalId String?  @map("external_id")
 
-  OfficialGames OfficialGame[]
+  officialGames OfficialGame[]
 
   @@map("official")
 }
