@@ -21,7 +21,7 @@ export default function App() {
       <body>
         <div className='flex justify-center bg-light-gray min-h-screen'>
           <div className='bg-white xl:w-[1476px] shadow-md mx-auto'>
-            <Header className='fixed top-0 w-full' />
+            <Header />
             <Outlet />
             <ScrollRestoration />
             <Scripts />
