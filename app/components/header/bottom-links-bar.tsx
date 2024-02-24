@@ -1,5 +1,6 @@
 import { Link } from '@remix-run/react';
 import { SingleLinkData } from './top-links-bar';
+import { TriangleDown } from './triangle-down';
 
 export function BottomLinksBar(): JSX.Element {
   const linksData: SingleLinkData[] = [
@@ -64,6 +65,7 @@ function LinkSection({ linkData, isFullSiteLink }: { linkData: SingleLinkData; i
       <Link to={linkData.href} className='text-sm'>
         {linkData.linkText}
       </Link>
+      {isFullSiteLink && <TriangleDown />}
     </div>
   );
 }
