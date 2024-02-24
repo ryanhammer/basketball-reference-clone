@@ -1,4 +1,5 @@
 import BasketballRefLogo from './basketball-ref-logo';
+import { BottomLinksBar } from './bottom-links-bar';
 import { SearchBar } from './search-bar';
 import { TopLinksBar } from './top-links-bar';
 
@@ -10,6 +11,7 @@ export function Header() {
         <BasketballRefLogo className='w-64' />
         <SearchBar />
       </div>
+      <BottomLinksBar />
     </header>
   );
 }
