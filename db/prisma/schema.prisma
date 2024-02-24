@@ -192,7 +192,7 @@ model Venue {
 model Game {
   id               String   @id @default(cuid())
   seasonId         String   @map("season_id")
-  date             DateTime
+  date             String
   homeTeamId       String   @map("home_team_id")
   awayTeamId       String   @map("away_team_id")
   venueId          String   @map("venue_id")

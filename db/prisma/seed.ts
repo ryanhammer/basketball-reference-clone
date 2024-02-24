@@ -1,8 +1,8 @@
-import { platformDB } from 'prisma';
-import { franchiseData, teamData, Abbreviation } from '../public/data/team-data';
-import { venueData, teamVenueData } from '../public/data/venue-data';
-import { playerData } from '../public/data/player-data';
-import { determinePlayerBirthplaceInfo } from '../app/utils/model-utils';
+import { platformDB } from 'db/prisma';
+import { franchiseData, teamData, Abbreviation } from '../../public/data/team-data';
+import { venueData, teamVenueData } from '../../public/data/venue-data';
+import { playerData } from '../../public/data/player-data';
+import { determinePlayerBirthplaceInfo } from '../../app/utils/model-utils';
 
 async function seed() {
   console.log('🌱 Seeding...');
