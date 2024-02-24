@@ -16,7 +16,12 @@
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "typecheck": "tsc"
   },
-  "eslintIgnore": ["/node_modules", "/build", "/public/build", "/postgres-data"],
+  "eslintIgnore": [
+    "/node_modules",
+    "/build",
+    "/public/build",
+    "/postgres-data"
+  ],
   "dependencies": {
     "@prisma/client": "^5.10.2",
     "@remix-run/css-bundle": "^2.7.2",
@@ -32,6 +37,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
     "@remix-run/dev": "^2.7.2",
+    "@sly-cli/sly": "^1.8.0",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
