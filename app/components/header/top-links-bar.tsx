@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 
-interface SingleLinkData {
+export interface SingleLinkData {
   linkText: string;
   href: string;
 }
