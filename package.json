@@ -4,8 +4,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev --manual",
+    "dev": "remix vite:dev",
+    "build": "remix vite:build",
+    "start": "remix-serve ./build/index.js",
     "dev:db:apply-new-migrations": "prisma migrate dev",
     "dev:db:seed": "npm run dev:db:reset && prisma db seed",
     "dev:db:reset": "prisma migrate reset --skip-seed",
@@ -13,7 +14,6 @@
     "docker": "docker compose up -d",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
-    "start": "remix-serve ./build/index.js",
     "typecheck": "tsc"
   },
   "eslintIgnore": [
@@ -37,11 +37,13 @@
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
     "@remix-run/dev": "^2.7.2",
+    "@sly-cli/sly": "^1.8.0",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^7.0.2",
+    "autoprefixer": "^10.4.17",
     "binode": "^1.0.5",
     "eslint": "^8.38.0",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -53,7 +55,8 @@
     "prisma": "^5.10.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
