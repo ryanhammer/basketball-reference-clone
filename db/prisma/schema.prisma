@@ -314,6 +314,7 @@ model PlayerGame {
   playerSeasonId       String   @map("player_season_id")
   points               Int
   secondsPlayed        Int      @map("seconds_played")
+  didStart             Boolean  @map("did_start")
   fieldGoals           Int      @map("field_goals")
   fieldGoalAttempts    Int      @map("field_goal_attempts")
   threePointers        Int      @map("three_pointers")
