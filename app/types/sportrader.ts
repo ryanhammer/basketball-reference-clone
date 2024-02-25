@@ -31,7 +31,7 @@ interface TeamGameSummary {
   scoring: GameScoring[];
   statistics: TeamGameStatistics;
   coaches: CoachData[];
-  players: PlayerGameGummary[];
+  players: PlayerGameSummary[];
 }
 
 interface GameScoring {
@@ -105,7 +105,7 @@ interface CoachData {
   reference: number;
 }
 
-interface PlayerGameGummary {
+export interface PlayerGameSummary {
   id: string;
   full_name: string;
   jersey_number: string;
