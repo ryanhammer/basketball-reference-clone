@@ -146,7 +146,7 @@ async function seed() {
               lastName: player.last_name,
               position: player.primary_position,
               birthDate: player.birthdate,
-              height: player.height.toString(),
+              height: player.height,
               weight: player.weight,
               ...determinePlayerBirthplaceInfo(player.birth_place),
               shootingHand: 'right',

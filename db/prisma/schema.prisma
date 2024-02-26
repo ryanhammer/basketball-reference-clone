@@ -69,7 +69,7 @@ model Player {
   birthCity      String    @map("birth_city")
   birthState     String?   @map("birth_state")
   birthCountry   String    @map("birth_country")
-  height         String
+  height         Int
   weight         Int
   position       String
   shootingHand   String    @map("shooting_hand")
