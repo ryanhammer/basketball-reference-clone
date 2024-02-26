@@ -62,13 +62,13 @@ export async function prepareGameSummaryToGame(
       gameSummaryDuration: gameSummary.duration,
       teamGameSummary: home,
       opponentGameSummary: away,
-      teamSeasonId: homeTeam.id,
+      teamSeasonId: homeTeamSeason.id,
     }),
     prepareGameSummaryToTeamGames({
       gameSummaryDuration: gameSummary.duration,
       teamGameSummary: away,
       opponentGameSummary: home,
-      teamSeasonId: awayTeam.id,
+      teamSeasonId: awayTeamSeason.id,
     }),
   ]);
 
