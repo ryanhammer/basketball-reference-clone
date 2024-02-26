@@ -14,7 +14,8 @@
     "docker": "docker compose up -d",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "script:update-db-from-game-summary": "tsx -r dotenv/config ./scripts/update-db-from-game-summary.ts"
   },
   "eslintIgnore": [
     "/node_modules",
@@ -28,6 +29,7 @@
     "@remix-run/node": "^2.7.2",
     "@remix-run/react": "^2.7.2",
     "@remix-run/serve": "^2.7.2",
+    "dotenv": "^16.4.5",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -59,7 +61,8 @@
     "vite": "^5.1.4"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "schema": "./db/prisma/schema.prisma",
+    "seed": "tsx ./db/prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.0.0"
