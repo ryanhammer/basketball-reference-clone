@@ -110,11 +110,10 @@ model Season {
   updatedAt  DateTime   @updatedAt @map("updated_at")
   externalId String?    @map("external_id")
 
-  league        League          @relation(fields: [leagueId], references: [id])
+  league        League         @relation(fields: [leagueId], references: [id])
   teamSeasons   TeamSeason[]
   seasonGames   Game[]
   playerSeasons PlayerSeason[]
-  coachGames    HeadCoachGame[]
 
   @@map("season")
 }
@@ -160,13 +159,14 @@ model TeamSeason {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  team            Team           @relation(fields: [teamId], references: [id])
-  season          Season         @relation(fields: [seasonId], references: [id])
-  homeGames       Game[]         @relation("HomeTeam")
-  awayGames       Game[]         @relation("AwayTeam")
+  team            Team            @relation(fields: [teamId], references: [id])
+  season          Season          @relation(fields: [seasonId], references: [id])
+  homeGames       Game[]          @relation("HomeTeam")
+  awayGames       Game[]          @relation("AwayTeam")
   teamSeasonGames TeamGame[]
   playerSeasons   PlayerSeason[]
-  venue           Venue          @relation(fields: [venueId], references: [id])
+  venue           Venue           @relation(fields: [venueId], references: [id])
+  coachGames      HeadCoachGame[]
 
   @@map("team_season")
 }
@@ -384,16 +384,16 @@ model Coach {
 }
 
 model HeadCoachGame {
-  id         String   @id @default(cuid())
-  coachId    String   @map("coach_id")
-  teamGameId String   @map("team_game_id")
-  seasonId   String   @map("season_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(cuid())
+  coachId      String   @map("coach_id")
+  teamGameId   String   @map("team_game_id")
+  teamSeasonId String   @map("season_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  coach    Coach    @relation(fields: [coachId], references: [id])
-  teamGame TeamGame @relation(fields: [teamGameId], references: [id])
-  season   Season   @relation(fields: [seasonId], references: [id])
+  coach      Coach      @relation(fields: [coachId], references: [id])
+  teamGame   TeamGame   @relation(fields: [teamGameId], references: [id])
+  teamSeason TeamSeason @relation(fields: [teamSeasonId], references: [id])
 
   @@map("head_coach_game")
 }
