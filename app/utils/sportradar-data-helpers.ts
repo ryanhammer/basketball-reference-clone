@@ -1,12 +1,5 @@
 import { PlayerSeason, Prisma } from '@prisma/client';
 import { utcToZonedTime, format } from 'date-fns-tz';
-import {
-  GameSummary,
-  TeamGameSummary,
-  PlayerGameSummary,
-  CoachData,
-  Venue as SportradarVenue,
-} from '../types/sportrader';
 import { getSeasonByLeagueYearAndType } from '../../db/access/season';
 import { getTeamByExternalId } from '../../db/access/team';
 import { createVenue, getVenueByExternalId } from '../../db/access/venue';
@@ -20,6 +13,15 @@ import {
 import { createPlayerGame } from '../../db/access/player-game';
 import { createCoach, getCoachByExternalId } from '../../db/access/coach';
 import { getTeamGameByTeamSeasonIdAndGameId } from '../../db/access/team-game';
+import { createOfficial, getOfficialByExternalId } from '../../db/access/official';
+import {
+  GameSummary,
+  TeamGameSummary,
+  PlayerGameSummary,
+  CoachData,
+  Venue as SportradarVenue,
+  Official,
+} from '../types/sportrader';
 
 export async function prepareGameSummaryToGame(
   gameSummary: GameSummary,
@@ -280,6 +282,29 @@ export async function prepareGameSummaryCoachesDataToHeadCoachGame({
   };
 }
 
+export async function prepareGameSummaryOfficialsDataToOfficialGame({
+  officialsData,
+  gameId,
+}: { officialsData: Official[]; gameId: string }): Promise<Prisma.OfficialGameCreateManyArgs['data']> {
+  const officialsGameCreateData = await Promise.all(
+    officialsData.map(async (officialData) => {
+      let official = await getOfficialByExternalId(officialData.id);
+
+      if (!official) {
+        official = await createOfficial({ externalId: officialData.id, fullName: officialData.full_name });
+      }
+
+      return {
+        officialId: official.id,
+        gameId,
+        number: Number(officialData.number),
+        assignment: officialData.assignment,
+      };
+    })
+  );
+
+  return officialsGameCreateData;
+}
 function convertGameMinutesToSeconds(minutes: string): number {
   return Number(minutes.split(':')[0]) * 60 + Number(minutes.split(':')[1]);
 }
