@@ -1,5 +1,4 @@
-import { PlayerSeason, Prisma } from '@prisma/client';
-import { utcToZonedTime, format } from 'date-fns-tz';
+import { PlayerSeason, Prisma, TeamSeason } from '@prisma/client';
 import { getSeasonByLeagueYearAndType } from '../../db/access/season';
 import { getTeamByExternalId } from '../../db/access/team';
 import { createVenue, getVenueByExternalId } from '../../db/access/venue';
@@ -14,6 +13,7 @@ import { createPlayerGame } from '../../db/access/player-game';
 import { createCoach, getCoachByExternalId } from '../../db/access/coach';
 import { getTeamGameByTeamSeasonIdAndGameId } from '../../db/access/team-game';
 import { createOfficial, getOfficialByExternalId } from '../../db/access/official';
+import { getTeamSeasonByTeamIdAndSeasonId, updateTeamSeason } from '../../db/access/team-season';
 import {
   GameSummary,
   TeamGameSummary,
@@ -21,17 +21,24 @@ import {
   CoachData,
   Venue as SportradarVenue,
   Official,
-} from '../types/sportrader';
+  TeamGameStatistics,
+} from '../types/sportradar';
 
 export async function prepareGameSummaryToGame(
   gameSummary: GameSummary,
   leagueId: string
-): Promise<Prisma.GameCreateArgs['data']> {
+): Promise<{ gameCreateData: Prisma.GameCreateArgs['data']; homeTeamSeason: TeamSeason; awayTeamSeason: TeamSeason }> {
   const season = await getSeasonByLeagueYearAndType({ leagueId, year: 2023, type: 'REG' });
   const [homeTeam, awayTeam] = await Promise.all([
     getTeamByExternalId(gameSummary.home.id),
     getTeamByExternalId(gameSummary.away.id),
   ]);
+
+  const [homeTeamSeason, awayTeamSeason] = await Promise.all([
+    getTeamSeasonByTeamIdAndSeasonId(homeTeam.id, season.id),
+    getTeamSeasonByTeamIdAndSeasonId(awayTeam.id, season.id),
+  ]);
+
   let venue = await getVenueByExternalId(gameSummary.venue.id);
 
   if (!venue) {
@@ -66,34 +73,86 @@ export async function prepareGameSummaryToGame(
   ]);
 
   return {
-    externalId: id,
-    homeTeamId: homeTeam.id,
-    awayTeamId: awayTeam.id,
-    seasonId: season.id,
-    date: format(utcToZonedTime(scheduled, 'America/New_York'), 'EEE, MMM dd, yyyy'),
-    scheduledStart: new Date(scheduled),
-    durationInMinutes: convertGameMinutesToSeconds(duration), // TODO: rename function to reflect multi-use
-    attendance,
-    venueId: venue.id,
-    homeTeamPoints: home.points,
-    awayTeamPoints: away.points,
-    homeTeamQ1Points: home.scoring[0].points,
-    homeTeamQ2Points: home.scoring[1].points,
-    homeTeamQ3Points: home.scoring[2].points,
-    homeTeamQ4Points: home.scoring[3].points,
-    homeTeamOTPoints,
-    awayTeamQ1Points: away.scoring[0].points,
-    awayTeamQ2Points: away.scoring[1].points,
-    awayTeamQ3Points: away.scoring[2].points,
-    awayTeamQ4Points: away.scoring[3].points,
-    awayTeamOTPoints,
-    notes: gameSummary.inseason_tournament ? 'Inseason Tournament' : null,
-    teamGames: {
-      createMany: {
-        data: [homeTeamGameInput, awayTeamGameInput],
+    gameCreateData: {
+      externalId: id,
+      homeTeamId: homeTeamSeason.id,
+      awayTeamId: awayTeamSeason.id,
+      seasonId: season.id,
+      date: convertScheduledGameStartFromUTCtoEST(scheduled),
+      scheduledStart: new Date(scheduled),
+      durationInMinutes: convertGameMinutesToSeconds(duration), // TODO: rename function to reflect multi-use
+      attendance,
+      venueId: venue.id,
+      homeTeamPoints: home.points,
+      awayTeamPoints: away.points,
+      homeTeamQ1Points: home.scoring[0].points,
+      homeTeamQ2Points: home.scoring[1].points,
+      homeTeamQ3Points: home.scoring[2].points,
+      homeTeamQ4Points: home.scoring[3].points,
+      homeTeamOTPoints,
+      awayTeamQ1Points: away.scoring[0].points,
+      awayTeamQ2Points: away.scoring[1].points,
+      awayTeamQ3Points: away.scoring[2].points,
+      awayTeamQ4Points: away.scoring[3].points,
+      awayTeamOTPoints,
+      notes: gameSummary.inseason_tournament ? 'Inseason Tournament' : null,
+      teamGames: {
+        createMany: {
+          data: [homeTeamGameInput, awayTeamGameInput],
+        },
       },
     },
+    homeTeamSeason,
+    awayTeamSeason,
   };
+}
+
+export async function updateTeamSeasonFromGameSummary({
+  teamSeason,
+  teamGameStatistics,
+  opponentGameStatistics,
+  attendance,
+  minutesPlayed,
+}: {
+  teamSeason: TeamSeason;
+  teamGameStatistics: TeamGameStatistics;
+  opponentGameStatistics: TeamGameStatistics;
+  attendance: number;
+  minutesPlayed: number;
+}): Promise<void> {
+  const possessions = Number(teamSeason.possessions) + teamGameStatistics.possessions;
+  const oppPossessions = Number(teamSeason.oppPossessions) + opponentGameStatistics.possessions;
+  const totalMinutesPlayed = Number(teamSeason.minutesPlayed) + minutesPlayed;
+
+  await updateTeamSeason(teamSeason.id, {
+    attendance: teamSeason.attendance + attendance,
+    gamesPlayed: teamSeason.gamesPlayed + 1,
+    gamesWon: teamSeason.gamesWon + teamGameStatistics.pls_min > 0 ? 1 : 0,
+    gamesLost: teamSeason.gamesLost + teamGameStatistics.pls_min < 0 ? 1 : 0,
+    points: teamSeason.points + teamGameStatistics.points,
+    oppPoints: teamSeason.oppPoints + opponentGameStatistics.points,
+    minutesPlayed: totalMinutesPlayed,
+    fieldGoals: teamSeason.fieldGoals + teamGameStatistics.field_goals_made,
+    fieldGoalAttempts: teamSeason.fieldGoalAttempts + teamGameStatistics.field_goals_att,
+    threePointers: teamSeason.threePointers + teamGameStatistics.three_points_made,
+    threePointAttempts: teamSeason.threePointAttempts + teamGameStatistics.three_points_att,
+    twoPointers: teamSeason.twoPointers + teamGameStatistics.two_points_made,
+    twoPointAttempts: teamSeason.twoPointAttempts + teamGameStatistics.two_points_att,
+    freeThrows: teamSeason.freeThrows + teamGameStatistics.free_throws_made,
+    freeThrowAttempts: teamSeason.freeThrowAttempts + teamGameStatistics.free_throws_att,
+    assists: teamSeason.assists + teamGameStatistics.assists,
+    rebounds: teamSeason.rebounds + teamGameStatistics.team_rebounds,
+    offRebounds: teamSeason.offRebounds + teamGameStatistics.team_offensive_rebounds,
+    defRebounds: teamSeason.defRebounds + teamGameStatistics.team_defensive_rebounds,
+    steals: teamSeason.steals + teamGameStatistics.steals,
+    blocks: teamSeason.blocks + teamGameStatistics.blocks,
+    turnovers: teamSeason.turnovers + teamGameStatistics.team_turnovers,
+    possessions, // TODO: calculate possessions
+    oppPossessions,
+    pace: (teamGameStatistics.possessions + opponentGameStatistics.possessions) / ((2 * totalMinutesPlayed) / 48),
+    offRating: (teamSeason.points + teamGameStatistics.points) / possessions, // TODO: calculate offensive rating
+    defRating: (teamSeason.oppPoints + opponentGameStatistics.points) / oppPossessions,
+  });
 }
 
 function createVenueData({ id, ...rest }: SportradarVenue) {
@@ -307,4 +366,19 @@ export async function prepareGameSummaryOfficialsDataToOfficialGame({
 }
 function convertGameMinutesToSeconds(minutes: string): number {
   return Number(minutes.split(':')[0]) * 60 + Number(minutes.split(':')[1]);
+}
+
+function convertScheduledGameStartFromUTCtoEST(scheduled: string): string {
+  const date = new Date(scheduled);
+
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  };
+
+  // Use Intl.DateTimeFormat with the defined options to format the date
+  return new Intl.DateTimeFormat('en-US', options).format(date);
 }
