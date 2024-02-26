@@ -159,13 +159,14 @@ model TeamSeason {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  team            Team           @relation(fields: [teamId], references: [id])
-  season          Season         @relation(fields: [seasonId], references: [id])
-  homeGames       Game[]         @relation("HomeTeam")
-  awayGames       Game[]         @relation("AwayTeam")
+  team            Team            @relation(fields: [teamId], references: [id])
+  season          Season          @relation(fields: [seasonId], references: [id])
+  homeGames       Game[]          @relation("HomeTeam")
+  awayGames       Game[]          @relation("AwayTeam")
   teamSeasonGames TeamGame[]
   playerSeasons   PlayerSeason[]
-  venue           Venue          @relation(fields: [venueId], references: [id])
+  venue           Venue           @relation(fields: [venueId], references: [id])
+  coachGames      HeadCoachGame[]
 
   @@map("team_season")
 }
@@ -190,31 +191,31 @@ model Venue {
 }
 
 model Game {
-  id               String   @id @default(cuid())
-  seasonId         String   @map("season_id")
-  date             DateTime
-  homeTeamId       String   @map("home_team_id")
-  awayTeamId       String   @map("away_team_id")
-  venueId          String   @map("venue_id")
-  attendance       Int?
-  duration         Int?
-  scheduledStart   DateTime @map("scheduled_start")
-  homeTeamPoints   Int      @map("home_team_points")
-  awayTeamPoints   Int      @map("away_team_points")
-  homeTeamQ1Points Int      @map("home_team_q1_points")
-  homeTeamQ2Points Int      @map("home_team_q2_points")
-  homeTeamQ3Points Int      @map("home_team_q3_points")
-  homeTeamQ4Points Int      @map("home_team_q4_points")
-  homeTeamOTPoints Int?     @map("home_team_ot_points")
-  awayTeamQ1Points Int      @map("away_team_q1_points")
-  awayTeamQ2Points Int      @map("away_team_q2_points")
-  awayTeamQ3Points Int      @map("away_team_q3_points")
-  awayTeamQ4Points Int      @map("away_team_q4_points")
-  awayTeamOTPoints Int?     @map("away_team_ot_points")
-  externalId       String?  @map("external_id")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  notes            String?
+  id                String   @id @default(cuid())
+  seasonId          String   @map("season_id")
+  date              String
+  homeTeamId        String   @map("home_team_id")
+  awayTeamId        String   @map("away_team_id")
+  venueId           String   @map("venue_id")
+  attendance        Int?
+  durationInMinutes Int?     @map("duration_in_minutes")
+  scheduledStart    DateTime @map("scheduled_start")
+  homeTeamPoints    Int      @map("home_team_points")
+  awayTeamPoints    Int      @map("away_team_points")
+  homeTeamQ1Points  Int      @map("home_team_q1_points")
+  homeTeamQ2Points  Int      @map("home_team_q2_points")
+  homeTeamQ3Points  Int      @map("home_team_q3_points")
+  homeTeamQ4Points  Int      @map("home_team_q4_points")
+  homeTeamOTPoints  Int?     @map("home_team_ot_points")
+  awayTeamQ1Points  Int      @map("away_team_q1_points")
+  awayTeamQ2Points  Int      @map("away_team_q2_points")
+  awayTeamQ3Points  Int      @map("away_team_q3_points")
+  awayTeamQ4Points  Int      @map("away_team_q4_points")
+  awayTeamOTPoints  Int?     @map("away_team_ot_points")
+  externalId        String?  @map("external_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  notes             String?
 
   season        Season         @relation(fields: [seasonId], references: [id])
   homeTeam      TeamSeason     @relation(name: "HomeTeam", fields: [homeTeamId], references: [id])
@@ -258,8 +259,9 @@ model TeamGame {
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
-  teamSeason TeamSeason @relation(fields: [teamSeasonId], references: [id])
-  seasonGame Game       @relation(fields: [gameId], references: [id])
+  teamSeason TeamSeason      @relation(fields: [teamSeasonId], references: [id])
+  seasonGame Game            @relation(fields: [gameId], references: [id])
+  coachGames HeadCoachGame[]
 
   @@map("team_game")
 }
@@ -312,6 +314,7 @@ model PlayerGame {
   playerSeasonId       String   @map("player_season_id")
   points               Int
   secondsPlayed        Int      @map("seconds_played")
+  didStart             Boolean  @map("did_start")
   fieldGoals           Int      @map("field_goals")
   fieldGoalAttempts    Int      @map("field_goal_attempts")
   threePointers        Int      @map("three_pointers")
@@ -366,4 +369,31 @@ model OfficialGame {
   game     Game     @relation(fields: [gameId], references: [id])
 
   @@map("official_game")
+}
+
+model Coach {
+  id         String   @id @default(cuid())
+  fullName   String   @map("full_name")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  externalId String?  @map("external_id")
+
+  coachGames HeadCoachGame[]
+
+  @@map("coach")
+}
+
+model HeadCoachGame {
+  id           String   @id @default(cuid())
+  coachId      String   @map("coach_id")
+  teamGameId   String   @map("team_game_id")
+  teamSeasonId String   @map("season_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  coach      Coach      @relation(fields: [coachId], references: [id])
+  teamGame   TeamGame   @relation(fields: [teamGameId], references: [id])
+  teamSeason TeamSeason @relation(fields: [teamSeasonId], references: [id])
+
+  @@map("head_coach_game")
 }
