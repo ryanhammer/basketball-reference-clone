@@ -34,3 +34,15 @@ export async function updatePlayerSeasonJerseyNumbers(
     },
   });
 }
+
+export async function updatePlayerSeason(
+  playerSeasonId: string,
+  playerSeasonData: Prisma.PlayerSeasonUpdateArgs['data']
+): Promise<PlayerSeason> {
+  return platformDB.playerSeason.update({
+    where: {
+      id: playerSeasonId,
+    },
+    data: playerSeasonData,
+  });
+}
