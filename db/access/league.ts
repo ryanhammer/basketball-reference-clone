@@ -9,10 +9,10 @@ export async function getLeagueById(leagueId: string): Promise<League | null> {
   });
 }
 
-export async function getLeagueByName(leagueName: string): Promise<League> {
+export async function getLeagueByAbbreviation(leagueAbbreviation: string): Promise<League> {
   return platformDB.league.findUniqueOrThrow({
     where: {
-      name: leagueName,
+      abbreviation: leagueAbbreviation,
     },
   });
 }
