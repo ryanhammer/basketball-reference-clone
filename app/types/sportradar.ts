@@ -68,12 +68,12 @@ interface GameStatistics {
   true_shooting_pct: number;
   defensive_rating: number;
   offensive_rating: number;
+  pls_min: number;
 }
 
 interface PlayerGameStatistics extends GameStatistics {
   rebounds: number;
   turnovers: number;
-  pls_min: number;
   double_double: boolean;
   triple_double: boolean;
   plus: number;
@@ -83,7 +83,7 @@ interface PlayerGameStatistics extends GameStatistics {
   rebounds_pct: number;
 }
 
-interface TeamGameStatistics extends GameStatistics {
+export interface TeamGameStatistics extends GameStatistics {
   team_turnovers: number;
   points_off_turnovers: number;
   team_rebounds: number;
