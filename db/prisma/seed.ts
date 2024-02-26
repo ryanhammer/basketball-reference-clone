@@ -24,10 +24,11 @@ async function seed() {
   const league = await platformDB.league.create({ data: leagueData });
 
   await Promise.all(
-    franchiseData.map((franchise) => {
-      platformDB.franchise.create({
+    franchiseData.map(async (franchise) => {
+      const { externalId, ...rest } = franchise;
+      await platformDB.franchise.create({
         data: {
-          ...franchise,
+          ...rest,
           leagueId: league.id,
           teams: {
             createMany: {
@@ -37,7 +38,7 @@ async function seed() {
                   abbreviation: franchise.abbreviation,
                   isActive: franchise.isActive,
                   inauguralSeason: teamData[franchise.abbreviation],
-                  externalId: franchise.externalId,
+                  externalId,
                   league: 'NBA',
                 },
               ],
@@ -51,6 +52,7 @@ async function seed() {
   await platformDB.venue.createMany({ data: venueData });
 
   const teams = await platformDB.team.findMany();
+  console.log('Teams:', teams);
 
   const season = await platformDB.season.create({
     data: {
@@ -165,8 +167,8 @@ async function seed() {
   ).flat();
 
   await Promise.all(
-    playerCreateInputWithTeamAndPlayerSeasonInfo.map((playerNestedCreateInput) => {
-      platformDB.player.create({
+    playerCreateInputWithTeamAndPlayerSeasonInfo.map(async (playerNestedCreateInput) => {
+      await platformDB.player.create({
         data: {
           ...playerNestedCreateInput.playerCreateInput,
           playerSeasons: {
