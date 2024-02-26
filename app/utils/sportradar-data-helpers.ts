@@ -22,7 +22,7 @@ import {
   Venue as SportradarVenue,
   Official,
   TeamGameStatistics,
-} from '../types/sportradar';
+} from '../types/sportradar/game-summary';
 
 export async function prepareGameSummaryToGame(
   gameSummary: GameSummary,

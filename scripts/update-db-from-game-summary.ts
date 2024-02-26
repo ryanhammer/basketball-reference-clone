@@ -4,7 +4,7 @@ import { getLeagueByAbbreviation } from '../db/access/league';
 import { createHeadCoachGame } from '../db/access/head-coach-game';
 import { createOfficialGames } from '../db/access/official-game';
 import { octoberGameIds, novemberGameIds } from '../public/data/game-data-2023-season';
-import { GameSummary } from '../app/types/sportradar';
+import { GameSummary } from '../app/types/sportradar/game-summary';
 import {
   prepareGameSummaryToGame,
   updateTeamSeasonFromGameSummary,
