@@ -191,31 +191,31 @@ model Venue {
 }
 
 model Game {
-  id               String   @id @default(cuid())
-  seasonId         String   @map("season_id")
-  date             String
-  homeTeamId       String   @map("home_team_id")
-  awayTeamId       String   @map("away_team_id")
-  venueId          String   @map("venue_id")
-  attendance       Int?
-  duration         Int?
-  scheduledStart   DateTime @map("scheduled_start")
-  homeTeamPoints   Int      @map("home_team_points")
-  awayTeamPoints   Int      @map("away_team_points")
-  homeTeamQ1Points Int      @map("home_team_q1_points")
-  homeTeamQ2Points Int      @map("home_team_q2_points")
-  homeTeamQ3Points Int      @map("home_team_q3_points")
-  homeTeamQ4Points Int      @map("home_team_q4_points")
-  homeTeamOTPoints Int?     @map("home_team_ot_points")
-  awayTeamQ1Points Int      @map("away_team_q1_points")
-  awayTeamQ2Points Int      @map("away_team_q2_points")
-  awayTeamQ3Points Int      @map("away_team_q3_points")
-  awayTeamQ4Points Int      @map("away_team_q4_points")
-  awayTeamOTPoints Int?     @map("away_team_ot_points")
-  externalId       String?  @map("external_id")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  notes            String?
+  id                String   @id @default(cuid())
+  seasonId          String   @map("season_id")
+  date              String
+  homeTeamId        String   @map("home_team_id")
+  awayTeamId        String   @map("away_team_id")
+  venueId           String   @map("venue_id")
+  attendance        Int?
+  durationInMinutes Int?     @map("duration_in_minutes")
+  scheduledStart    DateTime @map("scheduled_start")
+  homeTeamPoints    Int      @map("home_team_points")
+  awayTeamPoints    Int      @map("away_team_points")
+  homeTeamQ1Points  Int      @map("home_team_q1_points")
+  homeTeamQ2Points  Int      @map("home_team_q2_points")
+  homeTeamQ3Points  Int      @map("home_team_q3_points")
+  homeTeamQ4Points  Int      @map("home_team_q4_points")
+  homeTeamOTPoints  Int?     @map("home_team_ot_points")
+  awayTeamQ1Points  Int      @map("away_team_q1_points")
+  awayTeamQ2Points  Int      @map("away_team_q2_points")
+  awayTeamQ3Points  Int      @map("away_team_q3_points")
+  awayTeamQ4Points  Int      @map("away_team_q4_points")
+  awayTeamOTPoints  Int?     @map("away_team_ot_points")
+  externalId        String?  @map("external_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  notes             String?
 
   season        Season         @relation(fields: [seasonId], references: [id])
   homeTeam      TeamSeason     @relation(name: "HomeTeam", fields: [homeTeamId], references: [id])
