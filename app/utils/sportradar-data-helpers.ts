@@ -72,7 +72,7 @@ export async function prepareGameSummaryToGame(
     seasonId: season.id,
     date: format(utcToZonedTime(scheduled, 'America/New_York'), 'EEE, MMM dd, yyyy'),
     scheduledStart: new Date(scheduled),
-    duration: Number(duration),
+    durationInMinutes: convertGameMinutesToSeconds(duration), // TODO: rename function to reflect multi-use
     attendance,
     venueId: venue.id,
     homeTeamPoints: home.points,
