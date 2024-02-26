@@ -14,7 +14,8 @@
     "docker": "docker compose up -d",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "script:update-db-from-game-summary": "ts-node ./scripts/update-db-from-game-summary.ts"
   },
   "eslintIgnore": [
     "/node_modules",
