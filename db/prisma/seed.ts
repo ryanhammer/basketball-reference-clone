@@ -1,4 +1,4 @@
-import { platformDB } from 'db/prisma';
+import { platformDB } from './';
 import { franchiseData, teamData, Abbreviation } from '../../public/data/team-data';
 import { venueData, teamVenueData } from '../../public/data/venue-data';
 import { playerData } from '../../public/data/player-data';
