@@ -22,7 +22,7 @@ export interface Venue {
   country: string;
 }
 
-interface TeamGameSummary {
+export interface TeamGameSummary {
   name: string;
   alias: string;
   market: string;
@@ -98,7 +98,7 @@ interface TeamGameStatistics extends GameStatistics {
   opponent_possessions: number;
 }
 
-interface CoachData {
+export interface CoachData {
   id?: string;
   full_name: string;
   position: string;
@@ -111,8 +111,9 @@ export interface PlayerGameSummary {
   jersey_number: string;
   position: string;
   primary_position: string;
-  played: boolean;
-  active: boolean;
+  played?: boolean;
+  active?: boolean;
+  starter?: boolean;
   on_court: boolean;
   reference: number;
   statistics: PlayerGameStatistics;
