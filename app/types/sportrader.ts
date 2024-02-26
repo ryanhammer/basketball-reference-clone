@@ -119,7 +119,7 @@ export interface PlayerGameSummary {
   statistics: PlayerGameStatistics;
 }
 
-interface Official {
+export interface Official {
   id: string;
   full_name: string;
   number: string;
