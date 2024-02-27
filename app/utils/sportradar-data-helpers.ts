@@ -51,14 +51,6 @@ export async function prepareGameSummaryToGame(
 
   const { id, scheduled, duration, attendance, home, away } = gameSummary;
 
-  let homeTeamOTPoints;
-  let awayTeamOTPoints;
-
-  if (home.scoring.length > 4) {
-    homeTeamOTPoints = home.scoring.slice(4).reduce((acc, scoring) => acc + scoring.points, 0);
-    awayTeamOTPoints = away.scoring.slice(4).reduce((acc, scoring) => acc + scoring.points, 0);
-  }
-
   const [homeTeamGameInput, awayTeamGameInput] = await Promise.all([
     prepareGameSummaryToTeamGames({
       gameSummaryDuration: gameSummary.duration,
@@ -73,6 +65,11 @@ export async function prepareGameSummaryToGame(
       teamSeasonId: awayTeamSeason.id,
     }),
   ]);
+
+  const notes = gameSummary.inseason_tournament ? ['Inseason Tournament'] : [];
+  if (gameSummary.home.scoring.length > 4) {
+    notes.push(`${gameSummary.home.scoring.length === 5 ? '' : gameSummary.home.scoring.length - 4}OT`);
+  }
 
   return {
     gameCreateData: {
@@ -91,13 +88,23 @@ export async function prepareGameSummaryToGame(
       homeTeamQ2Points: home.scoring[1].points,
       homeTeamQ3Points: home.scoring[2].points,
       homeTeamQ4Points: home.scoring[3].points,
-      homeTeamOTPoints,
+      homeTeamOTPoints: home.scoring[4]?.points,
+      homeTeamOT2Points: home.scoring[5]?.points,
+      homeTeamOT3Points: home.scoring[6]?.points,
+      homeTeamOT4Points: home.scoring[7]?.points,
+      homeTeamOT5Points: home.scoring[8]?.points,
+      homeTeamOT6Points: home.scoring[9]?.points,
       awayTeamQ1Points: away.scoring[0].points,
       awayTeamQ2Points: away.scoring[1].points,
       awayTeamQ3Points: away.scoring[2].points,
       awayTeamQ4Points: away.scoring[3].points,
-      awayTeamOTPoints,
-      notes: gameSummary.inseason_tournament ? 'Inseason Tournament' : null,
+      awayTeamOTPoints: away.scoring[4]?.points,
+      awayTeamOT2Points: away.scoring[5]?.points,
+      awayTeamOT3Points: away.scoring[6]?.points,
+      awayTeamOT4Points: away.scoring[7]?.points,
+      awayTeamOT5Points: away.scoring[8]?.points,
+      awayTeamOT6Points: away.scoring[9]?.points,
+      notes,
       teamGames: {
         createMany: {
           data: [homeTeamGameInput, awayTeamGameInput],
@@ -351,11 +358,7 @@ export async function prepareGameSummaryCoachesDataToHeadCoachGame({
   Prisma.HeadCoachGameCreateArgs['data']
 > {
   const headCoachSummaryData = coachesData.filter((coach) => coach.position === 'Head Coach')[0];
-  const headCoachExternalId = headCoachSummaryData.id;
-
-  if (!headCoachExternalId) {
-    throw new Error('Unable to create HeadCoachGame: head coach external id missing');
-  }
+  const headCoachExternalId = headCoachSummaryData.id ?? headCoachSummaryData.reference.toString();
 
   let headCoach = await getCoachByExternalId(headCoachExternalId);
 
@@ -395,6 +398,12 @@ export async function prepareGameSummaryOfficialsDataToOfficialGame({
 
   return officialsGameCreateData;
 }
+
+export function delay(ms: number) {
+  // create delay to handle api rate limits
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function convertGameMinutesToSeconds(minutes: string): number {
   return Number(minutes.split(':')[0]) * 60 + Number(minutes.split(':')[1]);
 }
