@@ -61,32 +61,18 @@ async function processGameSummaryAndUpdateDb(gameSummaryData: GameSummary) {
   const homePlayersThatPlayedInGame = gameSummaryData.home.players.filter((player) => player.played === true);
   const awayPlayersThatPlayedInGame = gameSummaryData.away.players.filter((player) => player.played === true);
 
-  await Promise.all([
-    ...homePlayersThatPlayedInGame.map(async (player) => {
-      const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
-        playerGameSummary: player,
-        gameId: game.id,
-        seasonId: game.seasonId,
-        teamSeasonId: game.homeTeamId,
-        teamPossessionCount: gameSummaryData.home.statistics.possessions,
-        opponentPossessionCount: gameSummaryData.away.statistics.possessions,
-        teamGameDuration: gameSummaryData.home.statistics.minutes,
-      });
-      await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
-    }),
-    ...awayPlayersThatPlayedInGame.map(async (player) => {
-      const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
-        playerGameSummary: player,
-        gameId: game.id,
-        seasonId: game.seasonId,
-        teamSeasonId: game.awayTeamId,
-        teamPossessionCount: gameSummaryData.away.statistics.possessions,
-        opponentPossessionCount: gameSummaryData.home.statistics.possessions,
-        teamGameDuration: gameSummaryData.away.statistics.minutes,
-      });
-      await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
-    }),
-  ]);
+  for (const player of [...homePlayersThatPlayedInGame, ...awayPlayersThatPlayedInGame]) {
+    const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
+      playerGameSummary: player,
+      gameId: game.id,
+      seasonId: game.seasonId,
+      teamSeasonId: game.homeTeamId,
+      teamPossessionCount: gameSummaryData.home.statistics.possessions,
+      opponentPossessionCount: gameSummaryData.away.statistics.possessions,
+      teamGameDuration: gameSummaryData.home.statistics.minutes,
+    });
+    await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
+  }
 
   // create coach games from game summary data
   const [homeHeadCoachCreateGameData, awayHeadCoachCreateGameData] = await Promise.all([
