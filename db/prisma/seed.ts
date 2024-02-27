@@ -3,6 +3,7 @@ import { franchiseData, teamData, Abbreviation } from '../../public/data/team-da
 import { venueData, teamVenueData } from '../../public/data/venue-data';
 import { playerData } from '../../public/data/player-data';
 import { determinePlayerBirthplaceInfo } from '../../app/utils/model-utils';
+import { Prisma } from '@prisma/client';
 
 async function seed() {
   console.log('🌱 Seeding...');
@@ -23,36 +24,51 @@ async function seed() {
 
   const league = await platformDB.league.create({ data: leagueData });
 
-  await Promise.all(
-    franchiseData.map(async (franchise) => {
-      const { externalId, ...rest } = franchise;
-      await platformDB.franchise.create({
-        data: {
-          ...rest,
-          leagueId: league.id,
-          teams: {
-            createMany: {
-              data: [
-                {
-                  name: franchise.name,
-                  abbreviation: franchise.abbreviation,
-                  isActive: franchise.isActive,
-                  inauguralSeason: teamData[franchise.abbreviation],
-                  externalId,
-                  league: 'NBA',
-                },
-              ],
-            },
-          },
-        },
-      });
-    })
-  );
+  const teamPartialCreateManyInput: Omit<Prisma.TeamCreateArgs['data'], 'franchiseId'>[] = [];
+
+  const franchiseCreateManyInput: Prisma.FranchiseCreateManyArgs['data'] = franchiseData.map((franchise) => {
+    const { externalId, ...rest } = franchise;
+
+    teamPartialCreateManyInput.push({
+      name: franchise.name,
+      abbreviation: franchise.abbreviation,
+      isActive: franchise.isActive,
+      inauguralSeason: teamData[franchise.abbreviation],
+      externalId,
+      league: 'NBA',
+    });
+
+    return {
+      ...rest,
+      leagueId: league.id,
+    };
+  });
+
+  await platformDB.franchise.createMany({ data: franchiseCreateManyInput });
+
+  interface TeamLevelData {
+    franchiseId: string;
+    teamSeasonId: string;
+    venueId: string;
+  }
+  const teamLevelData: { [key in Abbreviation]: TeamLevelData } = {} as never;
+
+  (await platformDB.franchise.findMany()).map((franchise) => {
+    teamLevelData[franchise.abbreviation as Abbreviation] = {
+      franchiseId: franchise.id,
+      teamSeasonId: '',
+      venueId: '',
+    };
+  });
+
+  await platformDB.team.createMany({
+    data: teamPartialCreateManyInput.map((team) => ({
+      ...team,
+      franchiseId: teamLevelData[team.abbreviation as Abbreviation].franchiseId,
+    })),
+  });
 
   await platformDB.venue.createMany({ data: venueData });
-
-  const teams = await platformDB.team.findMany();
-  console.log('Teams:', teams);
 
   const season = await platformDB.season.create({
     data: {
@@ -107,84 +123,102 @@ async function seed() {
     ],
   });
 
-  const teamSeasonCreateInput = await Promise.all(
-    teams.map(async (team) => {
-      const teamVenue = await platformDB.venue.findFirst({
-        where: { externalId: teamVenueData[team.abbreviation as Abbreviation] },
-      });
+  const teams = await platformDB.team.findMany();
+  const venues = await platformDB.venue.findMany();
 
-      if (teamVenue) {
-        return {
-          seasonId: season.id,
-          teamId: team.id,
-          venueId: teamVenue.id,
-          isCurrent: true,
-        };
-      }
+  teams.forEach((team) => {
+    const teamVenue = venues.find((venue) => venue.externalId === teamVenueData[team.abbreviation as Abbreviation]);
+    if (teamVenue) {
+      teamLevelData[team.abbreviation as Abbreviation].venueId = teamVenue.id;
+    }
+  });
 
-      throw Error(`Unable to find venue ID for team ${team.abbreviation}`);
-    })
-  );
+  const teamSeasonCreateInput = teams.map((team) => {
+    return {
+      seasonId: season.id,
+      teamId: team.id,
+      venueId: teamLevelData[team.abbreviation as Abbreviation].venueId,
+      isCurrent: true,
+    };
+  });
 
   await platformDB.teamSeason.createMany({
     data: teamSeasonCreateInput,
   });
 
-  const playerCreateInputWithTeamAndPlayerSeasonInfo = (
-    await Promise.all(
-      teams.map(async (team) => {
-        const teamPlayerData = playerData[team.abbreviation as Abbreviation];
-        const teamSeason = await platformDB.teamSeason.findFirstOrThrow({
-          where: { teamId: team.id, seasonId: season.id },
-        });
+  const teamSeasons = await platformDB.teamSeason.findMany({ include: { team: true } });
 
-        const playerCreateNestedDataInput = teamPlayerData.map((player) => {
-          return {
-            playerCreateInput: {
-              fullName: player.full_name,
-              firstName: player.first_name,
-              lastName: player.last_name,
-              position: player.primary_position,
-              birthDate: player.birthdate,
-              height: player.height,
-              weight: player.weight,
-              ...determinePlayerBirthplaceInfo(player.birth_place),
-              shootingHand: 'right',
-              college: player.college,
-              draftTeam: player.draft?.team_id,
-              draftRound: player.draft ? Number(player.draft?.round) : undefined,
-              draftPosition: player.draft ? Number(player.draft?.pick) : undefined,
-              externalId: player.id,
-            },
-            teamSeasonId: teamSeason.id,
-            playerJerseyNumber: player.jersey_number,
-          };
-        });
+  teamSeasons.forEach((teamSeason) => {
+    teamLevelData[teamSeason.team.abbreviation as Abbreviation].teamSeasonId = teamSeason.id;
+  });
 
-        return playerCreateNestedDataInput;
-      })
-    )
-  ).flat();
+  const playerCreateInputWithTeamAndPlayerSeasonInfo = teams.flatMap((team) => {
+    const teamPlayerData = playerData[team.abbreviation as Abbreviation];
 
-  await Promise.all(
-    playerCreateInputWithTeamAndPlayerSeasonInfo.map(async (playerNestedCreateInput) => {
-      await platformDB.player.create({
-        data: {
-          ...playerNestedCreateInput.playerCreateInput,
-          playerSeasons: {
-            create: {
-              teamSeasonId: playerNestedCreateInput.teamSeasonId,
-              jerseyNumbers: playerNestedCreateInput.playerJerseyNumber
-                ? [Number(playerNestedCreateInput.playerJerseyNumber)]
-                : [],
-              isTwoWayContract: false,
-              seasonId: season.id,
-            },
-          },
+    const playerCreateNestedDataInput = teamPlayerData.map((player) => {
+      return {
+        playerCreateInput: {
+          fullName: player.full_name,
+          firstName: player.first_name,
+          lastName: player.last_name,
+          position: player.primary_position,
+          birthDate: player.birthdate,
+          height: player.height,
+          weight: player.weight,
+          ...determinePlayerBirthplaceInfo(player.birth_place),
+          shootingHand: 'right',
+          college: player.college,
+          draftTeam: player.draft?.team_id,
+          draftRound: player.draft ? Number(player.draft?.round) : undefined,
+          draftPosition: player.draft ? Number(player.draft?.pick) : undefined,
+          externalId: player.id,
         },
-      });
-    })
-  );
+        teamSeasonId: teamLevelData[team.abbreviation as Abbreviation].teamSeasonId,
+        playerJerseyNumber: player.jersey_number,
+      };
+    });
+
+    return playerCreateNestedDataInput;
+  });
+
+  await platformDB.player.createMany({
+    data: playerCreateInputWithTeamAndPlayerSeasonInfo.map(
+      (playerNestedCreateInput) => playerNestedCreateInput.playerCreateInput
+    ),
+  });
+
+  const players = await platformDB.player.findMany();
+
+  const playerSeasonCreateManyInput = players.map((player) => {
+    const teamSeasonId = playerCreateInputWithTeamAndPlayerSeasonInfo.find(
+      (p) => p.playerCreateInput.externalId === player.externalId
+    )?.teamSeasonId;
+
+    if (!teamSeasonId) {
+      throw Error(`Team season id not found for player with ID: ${player.id}`);
+    }
+    const jerseyNumbers = playerCreateInputWithTeamAndPlayerSeasonInfo.find(
+      (p) => p.playerCreateInput.externalId === player.externalId
+    )?.playerJerseyNumber
+      ? [
+          Number(
+            playerCreateInputWithTeamAndPlayerSeasonInfo.find(
+              (p) => p.playerCreateInput.externalId === player.externalId
+            )?.playerJerseyNumber
+          ),
+        ]
+      : [];
+
+    return {
+      playerId: player.id,
+      teamSeasonId,
+      jerseyNumbers,
+      isTwoWayContract: false,
+      seasonId: season.id,
+    };
+  });
+
+  await platformDB.playerSeason.createMany({ data: playerSeasonCreateManyInput });
 
   console.timeEnd(`🌱 Database has been seeded`);
 }
