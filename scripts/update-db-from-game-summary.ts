@@ -12,6 +12,7 @@ import {
   createPlayerGameAndUpdatePlayerSeason,
   prepareGameSummaryCoachesDataToHeadCoachGame,
   prepareGameSummaryOfficialsDataToOfficialGame,
+  delay,
 } from '../app/utils/sportradar-data-helpers';
 
 async function fetchGameSummary(gameId: string): Promise<GameSummary> {
@@ -26,6 +27,8 @@ async function fetchGameSummary(gameId: string): Promise<GameSummary> {
   }
 
   const data = await response.json();
+
+  await delay(1250);
 
   return data as GameSummary;
 }
@@ -130,12 +133,7 @@ async function updateDbFromGameSummary() {
     await processGameSummaryAndUpdateDb(gameSummaryData);
 
     console.timeEnd(`🌱 Database has been updated from game summary data`);
-    await delay(1000);
   }
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 updateDbFromGameSummary()
