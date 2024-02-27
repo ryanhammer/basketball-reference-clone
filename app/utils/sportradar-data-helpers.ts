@@ -2,7 +2,7 @@ import { PlayerSeason, Prisma, TeamSeason } from '@prisma/client';
 import { getSeasonByLeagueYearAndType } from '../../db/access/season';
 import { getTeamByExternalId } from '../../db/access/team';
 import { createVenue, getVenueByExternalId } from '../../db/access/venue';
-import { getPlayerByExternalId } from '../../db/access/player';
+import { createPlayer, getPlayerByExternalId } from '../../db/access/player';
 import {
   getPlayerSeasonByPlayerIdAndTeamSeasonId,
   createPlayerSeason,
@@ -23,6 +23,8 @@ import {
   Official,
   TeamGameStatistics,
 } from '../types/sportradar/game-summary';
+import { getPlayerProfileBySportradarId } from './sportradar-access-functions';
+import { determinePlayerBirthplaceInfo } from './model-utils';
 
 export async function prepareGameSummaryToGame(
   gameSummary: GameSummary,
@@ -223,7 +225,36 @@ export async function preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
   opponentPossessionCount: number;
   teamGameDuration: string;
 }): Promise<{ playerGameCreateData: Prisma.PlayerGameCreateArgs['data']; playerSeason: PlayerSeason }> {
-  const player = await getPlayerByExternalId(playerGameSummary.id);
+  let player = await getPlayerByExternalId(playerGameSummary.id);
+
+  if (!player) {
+    const playerProfileData = await getPlayerProfileBySportradarId(playerGameSummary.id);
+
+    player = await createPlayer({
+      externalId: playerGameSummary.id,
+      fullName: playerProfileData.full_name,
+      firstName: playerProfileData.first_name,
+      lastName: playerProfileData.last_name,
+      shootingHand: 'right', // TODO: update player data with correct shooting hand
+      position: playerProfileData.position,
+      height: playerProfileData.height,
+      weight: playerProfileData.weight,
+      birthDate: playerProfileData.birthdate,
+      ...determinePlayerBirthplaceInfo(playerProfileData.birth_place),
+      college: playerProfileData.college,
+      playerSeasons: {
+        create: [
+          {
+            teamSeasonId,
+            seasonId,
+            jerseyNumbers: [Number(playerGameSummary.jersey_number)],
+            isTwoWayContract: false, // TODO: update playerSeason data with correct two-way contract status
+          },
+        ],
+      },
+    });
+  }
+
   let playerSeason = await getPlayerSeasonByPlayerIdAndTeamSeasonId({ playerId: player.id, teamSeasonId });
 
   if (playerSeason && !playerSeason.jerseyNumbers.includes(Number(playerGameSummary.jersey_number))) {
