@@ -1,8 +1,8 @@
-import { platformDB } from './';
-import { franchiseData, teamData, Abbreviation } from '../../public/data/team-data';
-import { venueData, teamVenueData } from '../../public/data/venue-data';
-import { playerData } from '../../public/data/player-data';
-import { determinePlayerBirthplaceInfo } from '../../app/utils/model-utils';
+import { platformDB } from '.';
+import { franchiseData, teamData, Abbreviation } from '../public/data/team-data';
+import { venueData, teamVenueData } from '../public/data/venue-data';
+import { playerData } from '../public/data/player-data';
+import { determinePlayerBirthplaceInfo } from '../app/utils/model-utils';
 import { Prisma } from '@prisma/client';
 
 async function seed() {
