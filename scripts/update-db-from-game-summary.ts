@@ -1,4 +1,4 @@
-import { platformDB } from '../db/prisma';
+import { platformDB } from '../prisma';
 import { createGame } from '../db/access/game';
 import { getLeagueByAbbreviation } from '../db/access/league';
 import { createHeadCoachGame } from '../db/access/head-coach-game';

@@ -1,5 +1,5 @@
 import { Prisma, TeamSeason } from '@prisma/client';
-import { platformDB } from '../prisma';
+import { platformDB } from '../../prisma';
 
 export async function getTeamSeasonByTeamIdAndSeasonId(teamId: string, seasonId: string): Promise<TeamSeason> {
   return platformDB.teamSeason.findFirstOrThrow({

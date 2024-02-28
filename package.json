@@ -62,8 +62,7 @@
     "vite": "^5.1.4"
   },
   "prisma": {
-    "schema": "./db/prisma/schema.prisma",
-    "seed": "tsx -r dotenv/config ./db/prisma/seed.ts"
+    "seed": "tsx -r dotenv/config prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.0.0"
