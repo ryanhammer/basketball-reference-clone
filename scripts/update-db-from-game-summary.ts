@@ -4,7 +4,7 @@ import { getLeagueByAbbreviation } from '../db/access/league';
 import { createHeadCoachGame } from '../db/access/head-coach-game';
 import { createOfficialGames } from '../db/access/official-game';
 import { octoberGameIds, novemberGameIds } from '../public/data/game-data-2023-season';
-import { GameSummary } from '../app/types/sportradar';
+import { GameSummary } from '../app/types/sportradar/game-summary';
 import {
   prepareGameSummaryToGame,
   updateTeamSeasonFromGameSummary,
@@ -12,6 +12,7 @@ import {
   createPlayerGameAndUpdatePlayerSeason,
   prepareGameSummaryCoachesDataToHeadCoachGame,
   prepareGameSummaryOfficialsDataToOfficialGame,
+  delay,
 } from '../app/utils/sportradar-data-helpers';
 
 async function fetchGameSummary(gameId: string): Promise<GameSummary> {
@@ -26,6 +27,8 @@ async function fetchGameSummary(gameId: string): Promise<GameSummary> {
   }
 
   const data = await response.json();
+
+  await delay(1250);
 
   return data as GameSummary;
 }
@@ -58,32 +61,31 @@ async function processGameSummaryAndUpdateDb(gameSummaryData: GameSummary) {
   const homePlayersThatPlayedInGame = gameSummaryData.home.players.filter((player) => player.played === true);
   const awayPlayersThatPlayedInGame = gameSummaryData.away.players.filter((player) => player.played === true);
 
-  await Promise.all([
-    ...homePlayersThatPlayedInGame.map(async (player) => {
-      const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
-        playerGameSummary: player,
-        gameId: game.id,
-        seasonId: game.seasonId,
-        teamSeasonId: game.homeTeamId,
-        teamPossessionCount: gameSummaryData.home.statistics.possessions,
-        opponentPossessionCount: gameSummaryData.away.statistics.possessions,
-        teamGameDuration: gameSummaryData.home.statistics.minutes,
-      });
-      await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
-    }),
-    ...awayPlayersThatPlayedInGame.map(async (player) => {
-      const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
-        playerGameSummary: player,
-        gameId: game.id,
-        seasonId: game.seasonId,
-        teamSeasonId: game.awayTeamId,
-        teamPossessionCount: gameSummaryData.away.statistics.possessions,
-        opponentPossessionCount: gameSummaryData.home.statistics.possessions,
-        teamGameDuration: gameSummaryData.away.statistics.minutes,
-      });
-      await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
-    }),
-  ]);
+  for (const player of homePlayersThatPlayedInGame) {
+    const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
+      playerGameSummary: player,
+      gameId: game.id,
+      seasonId: game.seasonId,
+      teamSeasonId: game.homeTeamId,
+      teamPossessionCount: gameSummaryData.home.statistics.possessions,
+      opponentPossessionCount: gameSummaryData.away.statistics.possessions,
+      teamGameDuration: gameSummaryData.home.statistics.minutes,
+    });
+    await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
+  }
+
+  for (const player of awayPlayersThatPlayedInGame) {
+    const { playerGameCreateData, playerSeason } = await preparePlayerGameSummaryToPlayerGameAndPlayerSeason({
+      playerGameSummary: player,
+      gameId: game.id,
+      seasonId: game.seasonId,
+      teamSeasonId: game.awayTeamId,
+      teamPossessionCount: gameSummaryData.away.statistics.possessions,
+      opponentPossessionCount: gameSummaryData.home.statistics.possessions,
+      teamGameDuration: gameSummaryData.away.statistics.minutes,
+    });
+    await createPlayerGameAndUpdatePlayerSeason(playerGameCreateData, playerSeason);
+  }
 
   // create coach games from game summary data
   const [homeHeadCoachCreateGameData, awayHeadCoachCreateGameData] = await Promise.all([
@@ -130,12 +132,7 @@ async function updateDbFromGameSummary() {
     await processGameSummaryAndUpdateDb(gameSummaryData);
 
     console.timeEnd(`🌱 Database has been updated from game summary data`);
-    await delay(1000);
   }
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 updateDbFromGameSummary()
