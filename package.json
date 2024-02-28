@@ -10,6 +10,7 @@
     "dev:db:apply-new-migrations": "prisma migrate dev",
     "dev:db:seed": "npm run dev:db:reset && prisma db seed",
     "dev:db:reset": "prisma migrate reset --skip-seed",
+    "prod:db:seed": "prisma db seed",
     "format": "npx @biomejs/biome format --write ./app",
     "docker": "docker compose up -d",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
@@ -62,7 +63,7 @@
   },
   "prisma": {
     "schema": "./db/prisma/schema.prisma",
-    "seed": "tsx ./db/prisma/seed.ts"
+    "seed": "tsx -r dotenv/config ./db/prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.0.0"
