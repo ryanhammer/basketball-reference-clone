@@ -1,8 +1,8 @@
 import { Player, Prisma } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getPlayerByExternalId(externalId: string): Promise<Player | null> {
-  return platformDB.player.findFirst({
+  return appDB.player.findFirst({
     where: {
       externalId,
     },
@@ -10,7 +10,7 @@ export async function getPlayerByExternalId(externalId: string): Promise<Player 
 }
 
 export async function createPlayer(playerData: Prisma.PlayerCreateInput): Promise<Player> {
-  return platformDB.player.create({
+  return appDB.player.create({
     data: {
       ...playerData,
     },

@@ -1,10 +1,10 @@
-import { platformDB } from '../prisma';
-import { createGame } from '../db/access/game';
-import { getLeagueByAbbreviation } from '../db/access/league';
-import { createHeadCoachGame } from '../db/access/head-coach-game';
-import { createOfficialGames } from '../db/access/official-game';
-import { octoberGameIds, novemberGameIds } from '../public/data/game-data-2023-season';
-import { GameSummary } from '../app/types/sportradar/game-summary';
+import { appDB } from '../prisma';
+import { createGame } from '../access/app-db/game';
+import { getLeagueByAbbreviation } from '../access/app-db/league';
+import { createHeadCoachGame } from '../access/app-db/head-coach-game';
+import { createOfficialGames } from '../access/app-db/official-game';
+import { octoberGameIds, novemberGameIds } from '../../public/data/game-data-2023-season';
+import { GameSummary } from '../types/sportradar/game-summary';
 import {
   prepareGameSummaryToGame,
   updateTeamSeasonFromGameSummary,
@@ -13,7 +13,7 @@ import {
   prepareGameSummaryCoachesDataToHeadCoachGame,
   prepareGameSummaryOfficialsDataToOfficialGame,
   delay,
-} from '../app/utils/sportradar-data-helpers';
+} from '../utils/sportradar-data-helpers';
 
 async function fetchGameSummary(gameId: string): Promise<GameSummary> {
   const apiUrl = `http://api.sportradar.us/nba/trial/v8/en/games/${gameId}/summary.json?api_key=${process.env.SPORTRADAR_API_KEY}`;
@@ -114,7 +114,7 @@ async function processGameSummaryAndUpdateDb(gameSummaryData: GameSummary) {
 }
 
 async function updateDbFromGameSummary() {
-  await platformDB.$connect();
+  await appDB.$connect();
 
   const gameIds = [...octoberGameIds, ...novemberGameIds];
 
@@ -144,5 +144,5 @@ updateDbFromGameSummary()
     process.exit(1);
   })
   .finally(async () => {
-    await platformDB.$disconnect();
+    await appDB.$disconnect();
   });

@@ -1,8 +1,8 @@
 import { Team } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getTeamByExternalId(externalId: string): Promise<Team> {
-  return platformDB.team.findFirstOrThrow({
+  return appDB.team.findFirstOrThrow({
     where: {
       externalId,
     },

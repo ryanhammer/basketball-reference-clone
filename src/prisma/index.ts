@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 
 declare global {
   // eslint-disable-next-line
-  var __platformDB: PrismaClient | undefined;
+  var __appDB: PrismaClient | undefined;
 }
 
 let prismaClient: PrismaClient;
@@ -14,14 +14,14 @@ let prismaClient: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prismaClient = getPrismaClient();
 } else {
-  if (!global.__platformDB) {
-    global.__platformDB = getPrismaClient();
+  if (!global.__appDB) {
+    global.__appDB = getPrismaClient();
   }
 
-  prismaClient = global.__platformDB;
+  prismaClient = global.__appDB;
 }
 
-export const platformDB = prismaClient;
+export const appDB = prismaClient;
 
 function getPrismaClient() {
   const { DATABASE_URL } = process.env;
