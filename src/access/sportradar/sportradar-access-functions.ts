@@ -1,5 +1,5 @@
-import { PlayerProfile } from '../types/sportradar/player-profile';
-import { delay } from '../utils/sportradar-data-helpers';
+import { PlayerProfile } from '../../types/sportradar/player-profile';
+import { delay } from '../../utils/sportradar-data-helpers';
 
 export async function getPlayerProfileBySportradarId(sportradarPlayerId: string): Promise<PlayerProfile> {
   const apiUrl = `http://api.sportradar.us/nba/trial/v8/en/players/${sportradarPlayerId}/profile.json?api_key=${process.env.SPORTRADAR_API_KEY}`;

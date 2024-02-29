@@ -23,7 +23,7 @@ import {
   Official,
   TeamGameStatistics,
 } from '../types/sportradar/game-summary';
-import { getPlayerProfileBySportradarId } from './sportradar-access-functions';
+import { getPlayerProfileBySportradarId } from '../access/sportradar/sportradar-access-functions';
 import { determinePlayerBirthplaceInfo } from './model-utils';
 
 export async function prepareGameSummaryToGame(
