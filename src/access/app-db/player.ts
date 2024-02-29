@@ -1,5 +1,5 @@
 import { Player, Prisma } from '@prisma/client';
-import { appDB } from '../../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getPlayerByExternalId(externalId: string): Promise<Player | null> {
   return appDB.player.findFirst({

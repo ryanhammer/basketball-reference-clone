@@ -1,5 +1,5 @@
 import { League } from '@prisma/client';
-import { appDB } from '../../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getLeagueById(leagueId: string): Promise<League | null> {
   return appDB.league.findUnique({

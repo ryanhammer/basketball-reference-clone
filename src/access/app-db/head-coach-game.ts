@@ -1,5 +1,5 @@
 import { HeadCoachGame, Prisma } from '@prisma/client';
-import { appDB } from '../../../prisma';
+import { appDB } from '../../prisma';
 
 export async function createHeadCoachGame(
   headCoachGameData: Prisma.HeadCoachGameCreateArgs['data']

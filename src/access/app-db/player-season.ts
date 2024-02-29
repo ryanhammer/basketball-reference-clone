@@ -1,5 +1,5 @@
 import { PlayerSeason, Prisma } from '@prisma/client';
-import { appDB } from '../../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getPlayerSeasonByPlayerIdAndTeamSeasonId({
   playerId,

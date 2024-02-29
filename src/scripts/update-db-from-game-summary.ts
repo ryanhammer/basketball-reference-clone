@@ -1,4 +1,4 @@
-import { appDB } from '../../prisma';
+import { appDB } from '../prisma';
 import { createGame } from '../access/app-db/game';
 import { getLeagueByAbbreviation } from '../access/app-db/league';
 import { createHeadCoachGame } from '../access/app-db/head-coach-game';

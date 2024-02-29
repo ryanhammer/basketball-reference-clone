@@ -1,8 +1,8 @@
 import { appDB } from '.';
-import { franchiseData, teamData, Abbreviation } from '../public/data/team-data';
-import { venueData, teamVenueData } from '../public/data/venue-data';
-import { playerData } from '../public/data/player-data';
-import { determinePlayerBirthplaceInfo } from '../src/utils/model-utils';
+import { franchiseData, teamData, Abbreviation } from '../../public/data/team-data';
+import { venueData, teamVenueData } from '../../public/data/venue-data';
+import { playerData } from '../../public/data/player-data';
+import { determinePlayerBirthplaceInfo } from '../utils/model-utils';
 import { Prisma } from '@prisma/client';
 
 async function seed() {

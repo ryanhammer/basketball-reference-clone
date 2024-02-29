@@ -1,5 +1,5 @@
 import { Prisma, Venue } from '@prisma/client';
-import { appDB } from '../../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getVenueByExternalId(externalId: string): Promise<Venue | null> {
   return appDB.venue.findFirst({
