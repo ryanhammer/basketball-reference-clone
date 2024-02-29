@@ -1,8 +1,8 @@
 import { League } from '@prisma/client';
-import { platformDB } from '../../../prisma';
+import { appDB } from '../../../prisma';
 
 export async function getLeagueById(leagueId: string): Promise<League | null> {
-  return platformDB.league.findUnique({
+  return appDB.league.findUnique({
     where: {
       id: leagueId,
     },
@@ -10,7 +10,7 @@ export async function getLeagueById(leagueId: string): Promise<League | null> {
 }
 
 export async function getLeagueByAbbreviation(leagueAbbreviation: string): Promise<League> {
-  return platformDB.league.findUniqueOrThrow({
+  return appDB.league.findUniqueOrThrow({
     where: {
       abbreviation: leagueAbbreviation,
     },

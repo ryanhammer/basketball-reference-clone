@@ -1,4 +1,4 @@
-import { platformDB } from '.';
+import { appDB } from '.';
 import { franchiseData, teamData, Abbreviation } from '../public/data/team-data';
 import { venueData, teamVenueData } from '../public/data/venue-data';
 import { playerData } from '../public/data/player-data';
@@ -9,7 +9,7 @@ async function seed() {
   console.log('🌱 Seeding...');
   console.time(`🌱 Database has been seeded`);
 
-  await platformDB.$connect();
+  await appDB.$connect();
 
   if (process.env.NODE_ENV !== 'development') {
     throw Error('You can not run this script outside of your local development environment');
@@ -22,7 +22,7 @@ async function seed() {
     inauguralSeason: '1949-50',
   };
 
-  const league = await platformDB.league.create({ data: leagueData });
+  const league = await appDB.league.create({ data: leagueData });
 
   const teamPartialCreateManyInput: Omit<Prisma.TeamCreateArgs['data'], 'franchiseId'>[] = [];
 
@@ -44,7 +44,7 @@ async function seed() {
     };
   });
 
-  await platformDB.franchise.createMany({ data: franchiseCreateManyInput });
+  await appDB.franchise.createMany({ data: franchiseCreateManyInput });
 
   interface TeamLevelData {
     franchiseId: string;
@@ -53,7 +53,7 @@ async function seed() {
   }
   const teamLevelData: { [key in Abbreviation]: TeamLevelData } = {} as never;
 
-  (await platformDB.franchise.findMany()).map((franchise) => {
+  (await appDB.franchise.findMany()).map((franchise) => {
     teamLevelData[franchise.abbreviation as Abbreviation] = {
       franchiseId: franchise.id,
       teamSeasonId: '',
@@ -61,16 +61,16 @@ async function seed() {
     };
   });
 
-  await platformDB.team.createMany({
+  await appDB.team.createMany({
     data: teamPartialCreateManyInput.map((team) => ({
       ...team,
       franchiseId: teamLevelData[team.abbreviation as Abbreviation].franchiseId,
     })),
   });
 
-  await platformDB.venue.createMany({ data: venueData });
+  await appDB.venue.createMany({ data: venueData });
 
-  const season = await platformDB.season.create({
+  const season = await appDB.season.create({
     data: {
       year: 2023,
       startDate: '2023-10-24',
@@ -82,7 +82,7 @@ async function seed() {
     },
   });
 
-  await platformDB.season.createMany({
+  await appDB.season.createMany({
     data: [
       {
         year: 2023,
@@ -123,8 +123,8 @@ async function seed() {
     ],
   });
 
-  const teams = await platformDB.team.findMany();
-  const venues = await platformDB.venue.findMany();
+  const teams = await appDB.team.findMany();
+  const venues = await appDB.venue.findMany();
 
   teams.forEach((team) => {
     const teamVenue = venues.find((venue) => venue.externalId === teamVenueData[team.abbreviation as Abbreviation]);
@@ -142,11 +142,11 @@ async function seed() {
     };
   });
 
-  await platformDB.teamSeason.createMany({
+  await appDB.teamSeason.createMany({
     data: teamSeasonCreateInput,
   });
 
-  const teamSeasons = await platformDB.teamSeason.findMany({ include: { team: true } });
+  const teamSeasons = await appDB.teamSeason.findMany({ include: { team: true } });
 
   teamSeasons.forEach((teamSeason) => {
     teamLevelData[teamSeason.team.abbreviation as Abbreviation].teamSeasonId = teamSeason.id;
@@ -181,13 +181,13 @@ async function seed() {
     return playerCreateNestedDataInput;
   });
 
-  await platformDB.player.createMany({
+  await appDB.player.createMany({
     data: playerCreateInputWithTeamAndPlayerSeasonInfo.map(
       (playerNestedCreateInput) => playerNestedCreateInput.playerCreateInput
     ),
   });
 
-  const players = await platformDB.player.findMany();
+  const players = await appDB.player.findMany();
 
   const playerSeasonCreateManyInput = players.map((player) => {
     const teamSeasonId = playerCreateInputWithTeamAndPlayerSeasonInfo.find(
@@ -218,7 +218,7 @@ async function seed() {
     };
   });
 
-  await platformDB.playerSeason.createMany({ data: playerSeasonCreateManyInput });
+  await appDB.playerSeason.createMany({ data: playerSeasonCreateManyInput });
 
   console.timeEnd(`🌱 Database has been seeded`);
 }
@@ -229,5 +229,5 @@ seed()
     process.exit(1);
   })
   .finally(async () => {
-    await platformDB.$disconnect();
+    await appDB.$disconnect();
   });

@@ -1,8 +1,8 @@
 import { Prisma, Venue } from '@prisma/client';
-import { platformDB } from '../../../prisma';
+import { appDB } from '../../../prisma';
 
 export async function getVenueByExternalId(externalId: string): Promise<Venue | null> {
-  return platformDB.venue.findFirst({
+  return appDB.venue.findFirst({
     where: {
       externalId,
     },
@@ -10,7 +10,7 @@ export async function getVenueByExternalId(externalId: string): Promise<Venue | 
 }
 
 export async function createVenue(venueData: Prisma.VenueCreateArgs['data']): Promise<Venue> {
-  return platformDB.venue.create({
+  return appDB.venue.create({
     data: venueData,
   });
 }

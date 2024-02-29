@@ -1,4 +1,4 @@
-import { platformDB } from '../../prisma';
+import { appDB } from '../../prisma';
 import { createGame } from '../access/app-db/game';
 import { getLeagueByAbbreviation } from '../access/app-db/league';
 import { createHeadCoachGame } from '../access/app-db/head-coach-game';
@@ -114,7 +114,7 @@ async function processGameSummaryAndUpdateDb(gameSummaryData: GameSummary) {
 }
 
 async function updateDbFromGameSummary() {
-  await platformDB.$connect();
+  await appDB.$connect();
 
   const gameIds = [...octoberGameIds, ...novemberGameIds];
 
@@ -144,5 +144,5 @@ updateDbFromGameSummary()
     process.exit(1);
   })
   .finally(async () => {
-    await platformDB.$disconnect();
+    await appDB.$disconnect();
   });
