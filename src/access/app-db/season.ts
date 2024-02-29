@@ -1,12 +1,12 @@
 import { Season, SeasonType } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { appDB } from '../../prisma';
 
 export async function getSeasonByLeagueYearAndType({
   leagueId,
   year,
   type,
 }: { leagueId: string; year: number; type: SeasonType }): Promise<Season> {
-  return platformDB.season.findFirstOrThrow({
+  return appDB.season.findFirstOrThrow({
     where: {
       leagueId,
       year,

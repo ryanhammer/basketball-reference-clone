@@ -1,19 +1,19 @@
 import { PlayerSeason, Prisma, TeamSeason } from '@prisma/client';
-import { getSeasonByLeagueYearAndType } from '../../db/access/season';
-import { getTeamByExternalId } from '../../db/access/team';
-import { createVenue, getVenueByExternalId } from '../../db/access/venue';
-import { createPlayer, getPlayerByExternalId } from '../../db/access/player';
+import { getSeasonByLeagueYearAndType } from '../access/app-db/season';
+import { getTeamByExternalId } from '../access/app-db/team';
+import { createVenue, getVenueByExternalId } from '../access/app-db/venue';
+import { createPlayer, getPlayerByExternalId } from '../access/app-db/player';
 import {
   getPlayerSeasonByPlayerIdAndTeamSeasonId,
   createPlayerSeason,
   updatePlayerSeasonJerseyNumbers,
   updatePlayerSeason,
-} from '../../db/access/player-season';
-import { createPlayerGame } from '../../db/access/player-game';
-import { createCoach, getCoachByExternalId } from '../../db/access/coach';
-import { getTeamGameByTeamSeasonIdAndGameId } from '../../db/access/team-game';
-import { createOfficial, getOfficialByExternalId } from '../../db/access/official';
-import { getTeamSeasonByTeamIdAndSeasonId, updateTeamSeason } from '../../db/access/team-season';
+} from '../access/app-db/player-season';
+import { createPlayerGame } from '../access/app-db/player-game';
+import { createCoach, getCoachByExternalId } from '../access/app-db/coach';
+import { getTeamGameByTeamSeasonIdAndGameId } from '../access/app-db/team-game';
+import { createOfficial, getOfficialByExternalId } from '../access/app-db/official';
+import { getTeamSeasonByTeamIdAndSeasonId, updateTeamSeason } from '../access/app-db/team-season';
 import {
   GameSummary,
   TeamGameSummary,
@@ -23,7 +23,7 @@ import {
   Official,
   TeamGameStatistics,
 } from '../types/sportradar/game-summary';
-import { getPlayerProfileBySportradarId } from './sportradar-access-functions';
+import { getPlayerProfileBySportradarId } from '../access/sportradar/sportradar-access-functions';
 import { determinePlayerBirthplaceInfo } from './model-utils';
 
 export async function prepareGameSummaryToGame(

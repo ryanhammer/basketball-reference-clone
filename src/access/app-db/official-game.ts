@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { appDB } from '../../prisma';
 
 export async function createOfficialGames(officialGameData: Prisma.OfficialGameCreateManyArgs['data']): Promise<void> {
-  await platformDB.officialGame.createMany({
+  await appDB.officialGame.createMany({
     data: officialGameData,
   });
 }

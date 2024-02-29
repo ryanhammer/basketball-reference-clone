@@ -11,6 +11,7 @@ export default defineConfig({
   plugins: [
     remix({
       ignoredRouteFiles: ['**/*.css'],
+      appDirectory: 'src/web',
     }),
   ],
 });
