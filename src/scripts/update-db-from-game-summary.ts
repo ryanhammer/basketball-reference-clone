@@ -1,8 +1,8 @@
 import { platformDB } from '../../prisma';
-import { createGame } from '../access/game';
-import { getLeagueByAbbreviation } from '../access/league';
-import { createHeadCoachGame } from '../access/head-coach-game';
-import { createOfficialGames } from '../access/official-game';
+import { createGame } from '../access/app-db/game';
+import { getLeagueByAbbreviation } from '../access/app-db/league';
+import { createHeadCoachGame } from '../access/app-db/head-coach-game';
+import { createOfficialGames } from '../access/app-db/official-game';
 import { octoberGameIds, novemberGameIds } from '../../public/data/game-data-2023-season';
 import { GameSummary } from '../types/sportradar/game-summary';
 import {

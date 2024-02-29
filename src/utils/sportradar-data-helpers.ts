@@ -1,19 +1,19 @@
 import { PlayerSeason, Prisma, TeamSeason } from '@prisma/client';
-import { getSeasonByLeagueYearAndType } from '../access/season';
-import { getTeamByExternalId } from '../access/team';
-import { createVenue, getVenueByExternalId } from '../access/venue';
-import { createPlayer, getPlayerByExternalId } from '../access/player';
+import { getSeasonByLeagueYearAndType } from '../access/app-db/season';
+import { getTeamByExternalId } from '../access/app-db/team';
+import { createVenue, getVenueByExternalId } from '../access/app-db/venue';
+import { createPlayer, getPlayerByExternalId } from '../access/app-db/player';
 import {
   getPlayerSeasonByPlayerIdAndTeamSeasonId,
   createPlayerSeason,
   updatePlayerSeasonJerseyNumbers,
   updatePlayerSeason,
-} from '../access/player-season';
-import { createPlayerGame } from '../access/player-game';
-import { createCoach, getCoachByExternalId } from '../access/coach';
-import { getTeamGameByTeamSeasonIdAndGameId } from '../access/team-game';
-import { createOfficial, getOfficialByExternalId } from '../access/official';
-import { getTeamSeasonByTeamIdAndSeasonId, updateTeamSeason } from '../access/team-season';
+} from '../access/app-db/player-season';
+import { createPlayerGame } from '../access/app-db/player-game';
+import { createCoach, getCoachByExternalId } from '../access/app-db/coach';
+import { getTeamGameByTeamSeasonIdAndGameId } from '../access/app-db/team-game';
+import { createOfficial, getOfficialByExternalId } from '../access/app-db/official';
+import { getTeamSeasonByTeamIdAndSeasonId, updateTeamSeason } from '../access/app-db/team-season';
 import {
   GameSummary,
   TeamGameSummary,

@@ -1,5 +1,5 @@
 import { Season, SeasonType } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { platformDB } from '../../../prisma';
 
 export async function getSeasonByLeagueYearAndType({
   leagueId,

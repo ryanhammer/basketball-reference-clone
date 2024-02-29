@@ -1,5 +1,5 @@
 import { TeamGame } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { platformDB } from '../../../prisma';
 
 export async function getTeamGameByTeamSeasonIdAndGameId({
   teamSeasonId,

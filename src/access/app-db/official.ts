@@ -1,5 +1,5 @@
 import { Official, Prisma } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { platformDB } from '../../../prisma';
 
 export async function getOfficialByExternalId(externalId: string): Promise<Official | null> {
   return platformDB.official.findFirst({

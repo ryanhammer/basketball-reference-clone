@@ -1,5 +1,5 @@
 import { Coach } from '@prisma/client';
-import { platformDB } from '../../prisma';
+import { platformDB } from '../../../prisma';
 
 export async function getCoachByExternalId(externalId: string): Promise<Coach | null> {
   return platformDB.coach.findFirst({
