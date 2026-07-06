@@ -69,7 +69,7 @@ The schema uses a **Franchise → Team → TeamSeason** hierarchy to handle fran
 - **Formatter**: Biome (`npm run format`), not Prettier. Config in `biome.json`.
 - **No test suite yet** — this is a known gap.
 - **Prisma schema location** is non-default: `src/prisma/schema.prisma` (configured in `package.json` under `"prisma"`).
-- `appDirectory` for React Router is `src/web` (non-default, set in `vite.config.ts`).
+- `appDirectory` for React Router is `src/web` (non-default, set in `react-router.config.ts`).
 
 ## Deployment
 
