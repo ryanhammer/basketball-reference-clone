@@ -1,6 +1,6 @@
 import { PassThrough } from 'node:stream';
 
-import type { AppLoadContext, EntryContext } from 'react-router';
+import type { EntryContext } from 'react-router';
 import { ServerRouter } from 'react-router';
 import { createReadableStreamFromReadable } from '@react-router/node';
 import { isbot } from 'isbot';
@@ -14,7 +14,7 @@ export default function handleRequest(
   responseHeaders: Headers,
   routerContext: EntryContext,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  loadContext: AppLoadContext
+  loadContext: unknown
 ) {
   return isbot(request.headers.get('user-agent') || '')
     ? handleBotRequest(request, responseStatusCode, responseHeaders, routerContext)

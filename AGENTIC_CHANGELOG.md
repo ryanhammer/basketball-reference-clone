@@ -39,7 +39,25 @@ The repository was originally built in early 2024 as a portfolio project when ap
 - Updated `tsconfig.json` to include `.react-router/types/**/*` for generated route types
 - Confirmed clean `npm run typecheck`
 
-**Next:** Upgrade React Router v7 → v8 (pending documentation link from user).
+**Next:** Upgrade react-router v7 → v8.
+
+---
+
+## 2026-07-06 (continued)
+
+### Upgrade react-router v7 → v8
+
+**Prompt intent:** Complete the framework migration by upgrading to react-router v8.1.0.
+
+**Work done:**
+- Bumped `react-router`, `@react-router/dev`, `@react-router/node`, `@react-router/serve` to `^8.1.0`
+- Removed `future.v8_*` flags from `react-router.config.ts` — all are now default behavior in v8 and the `FutureConfig` type no longer accepts them
+- Removed `AppLoadContext` import from `entry.server.tsx` — no longer exported from `react-router` in v8; typed unused `loadContext` parameter as `unknown`
+- Confirmed clean `npm run typecheck`
+
+**Notable:** npm's `latest` tag correctly pointed to 8.1.0 but failed to upgrade from 7.x with a `"latest"` specifier — required explicit `"^8.1.0"` pins to force resolution.
+
+**Next:** Feature work — dynamic routing for league standings and season pages.
 
 ---
 
