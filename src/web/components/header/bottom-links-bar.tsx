@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import { SingleLinkData } from './top-links-bar';
 import { TriangleDown } from './triangle-down';
 
