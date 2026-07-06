@@ -12,7 +12,7 @@ interface MultipleLinksData {
 
 type LinksData = SingleLinkData | MultipleLinksData;
 
-export function TopLinksBar(): JSX.Element {
+export function TopLinksBar() {
   const linksData: LinksData[] = [
     {
       linkText: 'Baseball',
@@ -65,7 +65,7 @@ export function TopLinksBar(): JSX.Element {
   );
 }
 
-function LinkSection({ linkData, isLastLink }: { linkData: LinksData; isLastLink: boolean }): JSX.Element {
+function LinkSection({ linkData, isLastLink }: { linkData: LinksData; isLastLink: boolean }) {
   const borderStyles = isLastLink ? '' : 'border-r-[1px] border-light-gray border-opacity-50';
   if ('linkText' in linkData) {
     return (

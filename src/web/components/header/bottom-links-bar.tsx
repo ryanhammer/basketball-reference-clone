@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { SingleLinkData } from './top-links-bar';
 import { TriangleDown } from './triangle-down';
 
-export function BottomLinksBar(): JSX.Element {
+export function BottomLinksBar() {
   const linksData: SingleLinkData[] = [
     {
       linkText: 'Players',
@@ -59,7 +59,7 @@ export function BottomLinksBar(): JSX.Element {
   );
 }
 
-function LinkSection({ linkData, isFullSiteLink }: { linkData: SingleLinkData; isFullSiteLink: boolean }): JSX.Element {
+function LinkSection({ linkData, isFullSiteLink }: { linkData: SingleLinkData; isFullSiteLink: boolean }) {
   return (
     <div className='flex text-charcoal font-bold hover:bg-slate-gray hover:text-white px-8 h-8 items-center'>
       <Link to={linkData.href} className='text-sm'>
