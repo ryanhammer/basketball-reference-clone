@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 
-export function SearchBar(): JSX.Element {
+export function SearchBar() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

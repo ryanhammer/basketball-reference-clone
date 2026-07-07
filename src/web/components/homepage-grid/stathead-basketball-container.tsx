@@ -1,4 +1,4 @@
-export function StatheadBasketballContainer({ className }: { className?: string }): JSX.Element {
+export function StatheadBasketballContainer({ className }: { className?: string }) {
   return (
     <div className={`${className} border-2 border-gray-500`}>
       <h2>Powered by Stathead</h2>

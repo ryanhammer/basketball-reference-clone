@@ -1,12 +1,10 @@
-import { cssBundleHref } from '@remix-run/css-bundle';
-import type { LinksFunction } from '@remix-run/node';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import type { LinksFunction } from 'react-router';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import tailwindStylesheet from './index.css?url';
 import { Header } from './components/header';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: tailwindStylesheet },
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
 export default function App() {
