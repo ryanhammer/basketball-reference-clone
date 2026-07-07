@@ -129,7 +129,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           use_commit_signing: true
           claude_args: |
-            --allowedTools "Edit,Write,MultiEdit,mcp__github_file_ops__commit_files,mcp__github_file_ops__delete_files,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*),Bash(npm install),Bash(npm run:*),Bash(npx:*)"
+            --allowedTools "Edit,Write,MultiEdit,mcp__github_file_ops__commit_files,mcp__github_file_ops__delete_files,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*),Bash(bun install),Bash(bun run:*),Bash(bunx:*)"
           prompt: |
             You are an expert senior full-stack TypeScript/React engineer.
 
@@ -146,7 +146,7 @@ jobs:
             1. Carefully read the full PR diff and all Copilot review comments.
             2. Address only actionable issues — correctness, type safety, data access patterns, naming conventions. Skip style nits not backed by a rule in CLAUDE.md or .github/copilot-instructions.md.
             3. Make minimal, targeted changes. Do not refactor unrelated code.
-            4. Run `npm run typecheck` after making changes and fix any errors introduced.
+            4. Run `bun run typecheck` after making changes and fix any errors introduced.
             5. Commit with message: "chore: address Copilot review feedback [automated by Claude]"
             6. Post a comment on the PR summarising what was fixed and noting anything that could not be auto-addressed.
 

@@ -26,23 +26,23 @@ A clone of [Basketball Reference](https://www.basketball-reference.com/) built w
 
 ```bash
 # Local dev
-npm run docker                        # Start Postgres via Docker Compose
-npm run setup                         # prisma generate + migrate deploy + seed (first-time or after pulls)
-npm run dev                           # Start dev server on port 3000
+bun run docker                        # Start Postgres via Docker Compose
+bun run setup                         # prisma generate + migrate deploy + seed (first-time or after pulls)
+bun run dev                           # Start dev server on port 3000
 
 # Database
-npm run dev:db:seed                   # Reset DB and re-seed from scratch
-npm run dev:db:reset                  # Reset DB, skip seed
-npm run dev:db:apply-new-migrations   # Run new migrations in dev (generates migration file)
+bun run dev:db:seed                   # Reset DB and re-seed from scratch
+bun run dev:db:reset                  # Reset DB, skip seed
+bun run dev:db:apply-new-migrations   # Run new migrations in dev (generates migration file)
 
 # Data ingestion
-npm run script:update-db-from-game-summary  # Ingest game summary data from Sportradar
+bun run script:update-db-from-game-summary  # Ingest game summary data from Sportradar
 
 # Quality
-npm run format    # Biome formatter (not Prettier)
-npm run lint      # ESLint
-npm run typecheck # tsc --noEmit
-npm run build     # Production build
+bun run format    # Biome formatter (not Prettier)
+bun run lint      # ESLint
+bun run typecheck # tsc --noEmit
+bun run build     # Production build
 ```
 
 Required env vars (see `.env.example`): `DATABASE_URL`, `FLY_API_TOKEN`.

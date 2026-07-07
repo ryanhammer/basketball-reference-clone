@@ -37,7 +37,7 @@ Default to **no comments**. Add one only when the WHY is non-obvious: a hidden c
 
 ## Formatting
 
-- **Biome** handles formatting — run `npm run format`. Do not use Prettier.
+- **Biome** handles formatting — run `bun run format`. Do not use Prettier.
 
 ## Model Selection
 
