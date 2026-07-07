@@ -1,0 +1,162 @@
+name: Claude Auto-Address Copilot Review
+
+# Why this triggers on pull_request instead of pull_request_review:
+# Copilot code review submits reviews as copilot-pull-request-reviewer[bot].
+# Workflow runs *triggered by* that bot are always held for manual approval
+# ("action required", no jobs run), and GitHub provides no repo setting to
+# skip approval for code-review-triggered runs (the March 2026 setting only
+# covers the Copilot coding agent). Triggering on pull_request makes the
+# human pusher the actor — no approval gate — and the job waits for
+# Copilot's review of the pushed commit before running Claude.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, staging]
+
+  # Manual trigger for testing — processes the latest Copilot review on the PR
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to process'
+        required: true
+
+concurrency:
+  group: claude-auto-fix-${{ github.event.pull_request.number || inputs.pr_number || github.run_id }}
+  # Do NOT cancel in-progress runs. When Claude pushes its fix commit, that push
+  # is itself a `synchronize` event that starts a second run in this same group.
+  # With cancel-in-progress: true that second run would cancel the run that
+  # created the fix (it shows as "cancelled" even though the commit landed).
+  # With false, the second run queues, then the loop guard skips it.
+  cancel-in-progress: false
+
+jobs:
+  claude-auto-fix:
+    # Same-repo PRs only — fork PRs don't get a write token anyway
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+      id-token: write
+      actions: read
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+
+    steps:
+      - name: Resolve PR head
+        id: pr
+        run: |
+          set -euo pipefail
+          echo "trigger=${GITHUB_EVENT_NAME} actor=${GITHUB_ACTOR} repo=${GITHUB_REPOSITORY} run=${GITHUB_RUN_ID}"
+          pr_json=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")
+          head_ref=$(jq -r '.head.ref' <<<"$pr_json")
+          head_sha=$(jq -r '.head.sha' <<<"$pr_json")
+          base_ref=$(jq -r '.base.ref' <<<"$pr_json")
+          echo "head_ref=$head_ref" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "PR #${PR_NUMBER}: $head_ref @ $head_sha -> $base_ref"
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Loop guard — skip if head commit is an automated Claude fix
+        id: guard
+        run: |
+          subject=$(git log -1 --pretty=%s)
+          echo "Head commit subject: $subject"
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" && "$subject" == *"[automated by Claude]"* ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Head commit is an automated Claude fix — skipping to avoid a fix loop."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wait for Copilot review of this commit
+        id: wait
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          find_review() {
+            local filter="$1"
+            gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews" --paginate --jq \
+              "[.[] | select(.user.login | test(\"copilot\"; \"i\")) | ${filter}] | last.id // empty"
+          }
+
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            review_id=$(find_review '.')
+          else
+            review_id=""
+            for attempt in $(seq 1 20); do
+              review_id=$(find_review "select(.commit_id == \"$HEAD_SHA\")")
+              if [[ -n "$review_id" ]]; then
+                break
+              fi
+              echo "Attempt ${attempt}/20: no Copilot review for ${HEAD_SHA} yet, retrying in 30s"
+              sleep 30
+            done
+          fi
+
+          if [[ -n "$review_id" ]]; then
+            echo "Found Copilot review ${review_id}"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "review_id=$review_id" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Copilot review arrived for ${HEAD_SHA} within 10 minutes — nothing to fix."
+            gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews" --paginate --jq \
+              '.[] | select(.user.login | test("copilot"; "i")) | "  review \(.id) on \(.commit_id) at \(.submitted_at)"'
+          fi
+
+      - name: Run Claude to Address Copilot Feedback
+        id: claude
+        if: steps.wait.outputs.found == 'true'
+        # Pinned to v1.0.136 (0b1b620) — update intentionally when upgrading
+        uses: anthropics/claude-code-action@0b1b62002952733671bde978d429b50b51c51c85
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          use_commit_signing: true
+          claude_args: |
+            --allowedTools "Edit,Write,MultiEdit,mcp__github_file_ops__commit_files,mcp__github_file_ops__delete_files,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*),Bash(bun install),Bash(bun run:*),Bash(bunx:*)"
+          prompt: |
+            You are an expert senior full-stack TypeScript/React engineer.
+
+            Project context:
+            - Basketball reference site clone: React Router v8 (framework mode, SSR) + Node + TypeScript (strict) + Prisma + PostgreSQL + Tailwind CSS
+            - Follow ALL patterns from the existing codebase, CLAUDE.md, and .github/copilot-instructions.md
+            - Raw Prisma queries belong in src/access/app-db/, never inline in route files
+            - Use generated Route.LoaderArgs / Route.ComponentProps types — never `any`
+
+            You are working on PR #${{ env.PR_NUMBER }} in ${{ github.repository }}.
+            Copilot submitted review ${{ steps.wait.outputs.review_id }} on this PR.
+
+            Task:
+            1. Carefully read the full PR diff and all Copilot review comments.
+            2. Address only actionable issues — correctness, type safety, data access patterns, naming conventions. Skip style nits not backed by a rule in CLAUDE.md or .github/copilot-instructions.md.
+            3. Make minimal, targeted changes. Do not refactor unrelated code.
+            4. Run `bun run typecheck` after making changes and fix any errors introduced.
+            5. Commit with message: "chore: address Copilot review feedback [automated by Claude]"
+            6. Post a comment on the PR summarising what was fixed and noting anything that could not be auto-addressed.
+
+      - name: Run summary
+        if: always()
+        run: |
+          {
+            echo "### Claude auto-fix run"
+            echo "- trigger: \`${GITHUB_EVENT_NAME}\` | PR: #${PR_NUMBER}"
+            echo "- loop guard skip: \`${{ steps.guard.outputs.skip }}\`"
+            echo "- Copilot review found: \`${{ steps.wait.outputs.found }}\` (id: \`${{ steps.wait.outputs.review_id }}\`)"
+            echo "- Claude step outcome: \`${{ steps.claude.outcome }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

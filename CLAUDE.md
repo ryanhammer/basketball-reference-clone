@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Agent Skills
+
+**Official React Router skill** (load for any route/loader/action/form work):
+`.claude/skills/react-router-framework-mode/SKILL.md`
+
+**Project-specific skills** (load based on task):
+
+| File | Load when… |
+|---|---|
+| `agent-skills/data-access.md` | Writing loaders, Prisma queries, or adding access functions |
+| `agent-skills/coding-preferences.md` | Any code generation — naming, comments, abstractions, TypeScript |
+
+**Data model reference:** `docs/data-model.md` — read before writing any query that spans Season, TeamSeason, or Game.
+
+**PR feedback:** `/fix-pr-feedback <pr-number>` — fetches inline review comments and addresses each actionable one.
+
 ## Project Overview
 
 A clone of [Basketball Reference](https://www.basketball-reference.com/) built with React Router (framework mode), Prisma, PostgreSQL, and Tailwind CSS. Deployed to Fly.io. Data is sourced from the Sportradar API and stored locally in Postgres.
@@ -10,23 +26,23 @@ A clone of [Basketball Reference](https://www.basketball-reference.com/) built w
 
 ```bash
 # Local dev
-npm run docker                        # Start Postgres via Docker Compose
-npm run setup                         # prisma generate + migrate deploy + seed (first-time or after pulls)
-npm run dev                           # Start dev server on port 3000
+bun run docker                        # Start Postgres via Docker Compose
+bun run setup                         # prisma generate + migrate deploy + seed (first-time or after pulls)
+bun run dev                           # Start dev server on port 3000
 
 # Database
-npm run dev:db:seed                   # Reset DB and re-seed from scratch
-npm run dev:db:reset                  # Reset DB, skip seed
-npm run dev:db:apply-new-migrations   # Run new migrations in dev (generates migration file)
+bun run dev:db:seed                   # Reset DB and re-seed from scratch
+bun run dev:db:reset                  # Reset DB, skip seed
+bun run dev:db:apply-new-migrations   # Run new migrations in dev (generates migration file)
 
 # Data ingestion
-npm run script:update-db-from-game-summary  # Ingest game summary data from Sportradar
+bun run script:update-db-from-game-summary  # Ingest game summary data from Sportradar
 
 # Quality
-npm run format    # Biome formatter (not Prettier)
-npm run lint      # ESLint
-npm run typecheck # tsc --noEmit
-npm run build     # Production build
+bun run format    # Biome formatter (not Prettier)
+bun run lint      # ESLint
+bun run typecheck # tsc --noEmit
+bun run build     # Production build
 ```
 
 Required env vars (see `.env.example`): `DATABASE_URL`, `FLY_API_TOKEN`.

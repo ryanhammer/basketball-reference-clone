@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "react-router-framework-mode": {
+      "source": "remix-run/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-router-framework-mode/SKILL.md",
+      "note": "Symlinked from ../hammer-platform/.agents/skills/react-router-framework-mode"
+    }
+  }
+}
