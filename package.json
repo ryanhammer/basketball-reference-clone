@@ -8,15 +8,15 @@
     "build": "react-router build",
     "start": "react-router-serve ./build/server/index.js",
     "dev:db:apply-new-migrations": "prisma migrate dev",
-    "dev:db:seed": "npm run dev:db:reset && prisma db seed",
+    "dev:db:seed": "bun run dev:db:reset && prisma db seed",
     "dev:db:reset": "prisma migrate reset --skip-seed",
     "prod:db:seed": "prisma db seed",
-    "format": "npx @biomejs/biome format --write ./src",
+    "format": "bunx @biomejs/biome format --write ./src",
     "docker": "docker compose up -d",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "typecheck": "tsc",
-    "script:update-db-from-game-summary": "tsx -r dotenv/config ./src/scripts/update-db-from-game-summary.ts"
+    "script:update-db-from-game-summary": "bun --env-file .env ./src/scripts/update-db-from-game-summary.ts"
   },
   "eslintIgnore": [
     "/node_modules",
@@ -29,7 +29,6 @@
     "@react-router/node": "^8.1.0",
     "@react-router/serve": "^8.1.0",
     "react-router": "^8.1.0",
-    "dotenv": "^16.4.5",
     "isbot": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -46,7 +45,6 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^7.0.2",
     "autoprefixer": "^10.4.17",
-    "binode": "^1.0.5",
     "eslint": "^8.38.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.28.1",
@@ -55,16 +53,14 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "msw": "^2.2.1",
     "prisma": "^5.10.2",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "vite": "^7.0.0"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma",
-    "seed": "tsx -r dotenv/config src/prisma/seed.ts"
+    "seed": "bun --env-file .env src/prisma/seed.ts"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "bun": ">=1.0.0"
   }
 }
