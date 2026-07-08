@@ -17,7 +17,7 @@ FROM base as production-deps
 
 WORKDIR /myapp
 
-ADD package.json bun.lockb ./
+ADD package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
 # Build the app
