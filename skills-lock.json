@@ -5,7 +5,7 @@
       "source": "remix-run/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/react-router-framework-mode/SKILL.md",
-      "note": "Symlinked from ../hammer-platform/.agents/skills/react-router-framework-mode"
+      "note": "Vendored in .claude/skills/react-router-framework-mode (do not symlink — breaks CI)"
     }
   }
 }
