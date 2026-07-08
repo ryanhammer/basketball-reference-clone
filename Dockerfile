@@ -9,7 +9,7 @@ FROM base as deps
 
 WORKDIR /myapp
 
-ADD package.json bun.lockb ./
+ADD package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # Install production dependencies only
