@@ -18,6 +18,10 @@ You are reviewing pull requests for a basketball statistics reference site — a
 - Test coverage — no test suite exists yet; do not flag its absence.
 - Accessibility — defer until UI is more stable.
 
+## Agentic changelog
+
+This repository uses `AGENTIC_CHANGELOG.md` to track work done by AI agents. When reviewing a PR that includes agent-driven work, check that the changelog has been updated with an entry covering: the intent behind the prompt, what was changed, and any relevant context for the next session. Flag it as a review comment if missing.
+
 ## Review style
 
 - Reference exact file and line numbers.
