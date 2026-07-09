@@ -129,7 +129,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           use_commit_signing: true
           claude_args: |
-            --allowedTools "Edit,Write,MultiEdit,mcp__github_file_ops__commit_files,mcp__github_file_ops__delete_files,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*),Bash(bun install),Bash(bun run:*),Bash(bunx:*)"
+            --allowedTools "Read,Edit,Write,MultiEdit,Glob,Grep,mcp__github_file_ops__commit_files,mcp__github_file_ops__delete_files,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*),Bash(git log:*),Bash(git diff:*),Bash(bun install),Bash(bun run:*),Bash(bunx:*)"
           prompt: |
             You are an expert senior full-stack TypeScript/React engineer.
 
