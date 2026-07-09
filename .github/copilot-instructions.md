@@ -3,7 +3,7 @@
 You are reviewing pull requests for a basketball statistics reference site — a clone of basketball-reference.com — built as a portfolio project when applying to Sports Reference.
 
 - React Router v8 (framework mode, SSR) + Node + TypeScript + Tailwind CSS + Prisma + PostgreSQL
-- Deployed to Fly.io. Production DB on Supabase.
+- Deployed to Fly.io. Production DB hosting is TBD.
 
 ## What to prioritize
 

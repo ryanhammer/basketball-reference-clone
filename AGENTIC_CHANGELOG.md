@@ -116,7 +116,7 @@ The repository was originally built in early 2024 as a portfolio project when ap
 - Updated `docker-compose.yml` to use `postgres:16-alpine` (already pulled; avoids re-download)
 - Started the app's Docker postgres via `bun run docker`; imported the plain SQL dump via `docker exec psql`
 - Confirmed all 16 tables populated: 273 games, 548 players, 5 898 player-game rows, etc.
-- Set `DATABASE_URL` in `.env` to `postgresql://hammeredreferencedev:moarBballStats@localhost:5432/baketball-reference-clone`
+- Set `DATABASE_URL` in `.env` to `postgresql://hammeredreferencedev:moarBballStats@localhost:5432/baketball-reference-clone` (note: `baketball` is a legacy typo present in all migrations and the existing DB — intentionally preserved for consistency)
 - Verified `bunx prisma migrate status` — 17 migrations applied, schema up to date
 - Removed `supabase/` directory created during failed restore attempt
 
