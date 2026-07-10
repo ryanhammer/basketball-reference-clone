@@ -32,10 +32,12 @@ concurrency:
 
 jobs:
   claude-auto-fix:
-    # Same-repo PRs only — fork PRs don't get a write token anyway
+    # Same-repo PRs only — fork PRs don't get a write token anyway.
+    # Skip all PRs targeting main — review already ran when the feature branch merged to staging.
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.event.pull_request.base.ref != 'main')
 
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -45,6 +47,7 @@ jobs:
       issues: read
       id-token: write
       actions: read
+      workflows: write
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
