@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A clone of [Basketball Reference](https://www.basketball-reference.com/) built with React Router (framework mode), Prisma, PostgreSQL, and Tailwind CSS. Deployed to Fly.io. Data is sourced from the Sportradar API and stored locally in Postgres.
+A clone of [Basketball Reference](https://www.basketball-reference.com/) built with React Router (framework mode), Prisma, PostgreSQL, and Tailwind CSS. Deployed to Vercel. Data is sourced from the Sportradar API and stored locally in Postgres.
 
 ## Commands
 
@@ -45,7 +45,7 @@ bun run typecheck # tsc --noEmit
 bun run build     # Production build
 ```
 
-Required env vars (see `.env.example`): `DATABASE_URL`, `FLY_API_TOKEN`.
+Required env vars (see `.env.example`): `DATABASE_URL`.
 
 ## Architecture
 
@@ -89,4 +89,4 @@ The schema uses a **Franchise → Team → TeamSeason** hierarchy to handle fran
 
 ## Deployment
 
-Fly.io (`fly.toml`). Two environments: `staging` branch → staging app, `main` branch → production. The Dockerfile handles `prisma generate` at build time. Production DB hosting is TBD (previously Supabase, under reconsideration).
+Vercel. Deployment is handled automatically by Vercel's GitHub integration — no custom deploy workflow needed. CI runs lint and typecheck on every PR via `.github/workflows/ci.yml`. Production DB is Neon (serverless Postgres). `fly.toml` and `Dockerfile` are retained but inactive.
