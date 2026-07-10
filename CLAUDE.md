@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A clone of [Basketball Reference](https://www.basketball-reference.com/) built with React Router (framework mode), Prisma, PostgreSQL, and Tailwind CSS. Deployed to Fly.io. Data is sourced from the Sportradar API and stored locally in Postgres.
+A clone of [Basketball Reference](https://www.basketball-reference.com/) built with React Router (framework mode), Prisma, PostgreSQL, and Tailwind CSS. Deployed to Vercel. Data is sourced from the Sportradar API and stored locally in Postgres.
 
 ## Commands
 
