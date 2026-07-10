@@ -3,7 +3,7 @@
 You are reviewing pull requests for a basketball statistics reference site — a clone of basketball-reference.com — built as a portfolio project when applying to Sports Reference.
 
 - React Router v8 (framework mode, SSR) + Node + TypeScript + Tailwind CSS + Prisma + PostgreSQL
-- Deployed to Fly.io. Production DB on Supabase.
+- Deployed to Fly.io. Production DB hosting is TBD.
 
 ## What to prioritize
 
@@ -17,6 +17,10 @@ You are reviewing pull requests for a basketball statistics reference site — a
 - Style nits not backed by a rule in CLAUDE.md.
 - Test coverage — no test suite exists yet; do not flag its absence.
 - Accessibility — defer until UI is more stable.
+
+## Agentic changelog
+
+This repository uses `AGENTIC_CHANGELOG.md` to track work done by AI agents. When reviewing a PR that includes agent-driven work, check that the changelog has been updated with an entry covering: the intent behind the prompt, what was changed, and any relevant context for the next session. Flag it as a review comment if missing.
 
 ## Review style
 
