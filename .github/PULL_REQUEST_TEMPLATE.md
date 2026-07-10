@@ -7,7 +7,8 @@
 <!-- How to verify this works. Browser steps preferred since there's no test suite yet. -->
 
 1. Start local dev server: `bun run dev`
-2. 
+2. <!-- add steps here -->
+
 
 ## Checklist
 

@@ -58,11 +58,7 @@ export function EveryTeamContainer({ className, standings, year }: Props) {
 
   return (
     <div className={className}>
-      <h2 className='text-lg font-bold border-b border-gray-300 pb-0.5 mb-1'>
-        <Link to='/teams/' className='hover:underline'>
-          Every NBA Team
-        </Link>
-      </h2>
+      <h2 className='text-lg font-bold border-b border-gray-300 pb-0.5 mb-1'>Every NBA Team</h2>
       <h3 className='text-sm font-semibold mb-1'>{displayYear} NBA Standings</h3>
       <div className='grid grid-cols-2 gap-2'>
         <ConferenceTable conference='East' rows={eastStandings} year={year} />

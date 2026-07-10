@@ -14,7 +14,7 @@ export async function getStandingsForSeason(seasonId: string): Promise<StandingE
   return appDB.teamSeason.findMany({
     where: { seasonId },
     select: standingsSelect,
-    orderBy: { gamesWon: 'desc' },
+    orderBy: [{ gamesWon: 'desc' }, { gamesLost: 'asc' }],
   });
 }
 
