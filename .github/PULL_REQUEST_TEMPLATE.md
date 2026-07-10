@@ -1,15 +1,21 @@
-<!-- Summary: Put your summary here -->
+## Summary
+
+<!-- What does this PR do and why? -->
 
 ## Test Plan
 
-<!-- What steps need to be taken to verify this works as expected? -->
+<!-- How to verify this works. Browser steps preferred since there's no test suite yet. -->
+
+1. Start local dev server: `bun run dev`
+2. 
 
 ## Checklist
 
-- [ ] Tests updated
-- [ ] Docs updated
+- [ ] `bun run typecheck` passes
+- [ ] `bun run lint` passes
+- [ ] Tested in browser locally
+- [ ] Vercel preview deploy looks correct (link below if applicable)
 
 ## Screenshots
 
-<!-- If what you're changing is within the app, please show before/after.
-You can provide a video as well if that makes more sense -->
+<!-- For any UI changes, paste before/after screenshots or a short screen recording. -->
