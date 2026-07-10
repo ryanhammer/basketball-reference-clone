@@ -21,8 +21,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          TITLE="${{ github.event.pull_request.title }}"
-          BODY="${{ github.event.pull_request.body }}"
+          # Read title/body from the event payload via jq so they are treated as
+          # data, not shell code — avoids injection from special characters.
+          TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          BODY=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
           HEAD="staging"
           BASE="main"
 

@@ -33,7 +33,7 @@ concurrency:
 jobs:
   claude-auto-fix:
     # Same-repo PRs only — fork PRs don't get a write token anyway.
-    # Skip staging → main promotion PRs: review already ran on the feature branch.
+    # Skip all PRs targeting main — review already ran when the feature branch merged to staging.
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
