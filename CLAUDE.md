@@ -61,7 +61,7 @@ src/
     migrations/   # Prisma migration history
     seed.ts       # DB seed script
     index.ts      # Exports `appDB` (the PrismaClient singleton)
-  scripts/        # One-off data ingestion scripts (run with tsx)
+  scripts/        # One-off data ingestion scripts (run with bun)
   types/          # External API response types (Sportradar)
   utils/          # Shared helpers (model utilities, Sportradar data transformers)
   web/
@@ -82,11 +82,11 @@ The schema uses a **Franchise → Team → TeamSeason** hierarchy to handle fran
 
 ### Tooling notes
 
-- **Formatter**: Biome (`npm run format`), not Prettier. Config in `biome.json`.
+- **Formatter**: Biome (`bun run format`), not Prettier. Config in `biome.json`.
 - **No test suite yet** — this is a known gap.
 - **Prisma schema location** is non-default: `src/prisma/schema.prisma` (configured in `package.json` under `"prisma"`).
 - `appDirectory` for React Router is `src/web` (non-default, set in `react-router.config.ts`).
 
 ## Deployment
 
-Fly.io (`fly.toml`). Two environments: `staging` branch → staging app, `main` branch → production. The Dockerfile handles `prisma generate` at build time. Production DB is hosted on Supabase.
+Fly.io (`fly.toml`). Two environments: `staging` branch → staging app, `main` branch → production. The Dockerfile handles `prisma generate` at build time. Production DB hosting is TBD (previously Supabase, under reconsideration).
