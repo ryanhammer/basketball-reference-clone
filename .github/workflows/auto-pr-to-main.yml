@@ -1,0 +1,50 @@
+name: Auto PR staging → main
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [staging]
+
+jobs:
+  open-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Open or skip PR to main
+        run: |
+          set -euo pipefail
+
+          # Read title/body from the event payload via jq so they are treated as
+          # data, not shell code — avoids injection from special characters.
+          TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          BODY=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
+          HEAD="staging"
+          BASE="main"
+
+          # Idempotent: skip if an open PR from staging → main already exists
+          existing=$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --head "$HEAD" \
+            --base "$BASE" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [[ -n "$existing" ]]; then
+            echo "::notice::PR #${existing} from staging → main already open — skipping."
+            exit 0
+          fi
+
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --head "$HEAD" \
+            --base "$BASE" \
+            --title "$TITLE" \
+            --body "$BODY"
