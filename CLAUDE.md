@@ -87,6 +87,10 @@ The schema uses a **Franchise → Team → TeamSeason** hierarchy to handle fran
 - **Prisma schema location** is non-default: `src/prisma/schema.prisma` (configured in `package.json` under `"prisma"`).
 - `appDirectory` for React Router is `src/web` (non-default, set in `react-router.config.ts`).
 
+## Pull Requests
+
+When opening a PR with `gh pr create`, always pass `--base staging` (or `--base main` for hotfixes) and prefer `--body-file .github/PULL_REQUEST_TEMPLATE.md` (filled in) over inline `--body` for multi-line content. Never let `gh` infer the body from a commit message. Fill in the Summary and Test Plan sections — leave template comment placeholders only if there is genuinely nothing to add.
+
 ## Deployment
 
 Vercel. Deployment is handled automatically by Vercel's GitHub integration — no custom deploy workflow needed. CI runs lint and typecheck on every PR via `.github/workflows/ci.yml`. Production DB is Neon (serverless Postgres). `fly.toml` and `Dockerfile` are retained but inactive.
