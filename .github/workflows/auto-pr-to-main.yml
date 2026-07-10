@@ -14,14 +14,22 @@ jobs:
       pull-requests: write
 
     env:
-      # Use a PAT so the PR is opened as the repo owner, not the Actions bot.
+      # Use a PAT (not GITHUB_TOKEN) so the PR is opened as the repo owner.
       # PRs opened by GITHUB_TOKEN trigger the "approve workflows" gate.
+      # The permissions: block above constrains GITHUB_TOKEN only — it does not
+      # scope this PAT. The PAT must have pull_requests: write (fine-grained)
+      # or repo scope (classic) on this repository.
       GH_TOKEN: ${{ secrets.GH_PAT }}
 
     steps:
       - name: Open or skip PR to main
         run: |
           set -euo pipefail
+
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::GH_PAT secret is not configured. Add a PAT with pull_requests:write to repository secrets as GH_PAT."
+            exit 1
+          fi
 
           # Read title/body from the event payload via jq so they are treated as
           # data, not shell code — avoids injection from special characters.

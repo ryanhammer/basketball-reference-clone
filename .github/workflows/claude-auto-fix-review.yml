@@ -47,6 +47,7 @@ jobs:
       issues: read
       id-token: write
       actions: read
+      workflows: write
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
