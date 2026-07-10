@@ -89,9 +89,7 @@ The schema uses a **Franchise → Team → TeamSeason** hierarchy to handle fran
 
 ## Pull Requests
 
-When opening a PR with `gh pr create`, always pass an explicit `--body` built from the PR template at `.github/PULL_REQUEST_TEMPLATE.md`. Never let `gh` infer the body from a commit message. Fill in the Summary and Test Plan sections — leave the template comment placeholders only if there is genuinely nothing to add.
-
-Target branch is always `staging` (not `main`) unless it is a hotfix.
+When opening a PR with `gh pr create`, always pass `--base staging` (or `--base main` for hotfixes) and prefer `--body-file` with a filled-in copy of the PR template over inline `--body` for multi-line content. Never let `gh` infer the body from a commit message. Fill in the Summary and Test Plan sections — leave template comment placeholders only if there is genuinely nothing to add.
 
 ## Deployment
 
