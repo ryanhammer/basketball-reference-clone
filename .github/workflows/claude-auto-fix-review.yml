@@ -127,10 +127,15 @@ jobs:
         if: steps.wait.outputs.found == 'true'
         # Pinned to v1.0.136 (0b1b620) — update intentionally when upgrading
         uses: anthropics/claude-code-action@0b1b62002952733671bde978d429b50b51c51c85
+        env:
+          # Override the job-level GH_TOKEN so gh CLI calls inside the action
+          # use GH_PAT instead of GITHUB_TOKEN. gh CLI prefers GH_TOKEN over
+          # GITHUB_TOKEN, so without this the github_token input has no effect
+          # on gh commands. GH_PAT needs `workflow` scope (for .github/workflows/
+          # writes) and `repo` scope for content commits.
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # GH_PAT needs the `workflow` OAuth scope (to write .github/workflows/ files)
-          # and `repo` scope for content writes. GITHUB_TOKEN lacks the workflow scope.
           github_token: ${{ secrets.GH_PAT }}
           use_commit_signing: true
           claude_args: |
