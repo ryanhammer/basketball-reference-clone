@@ -14,7 +14,9 @@ jobs:
       pull-requests: write
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Use a PAT so the PR is opened as the repo owner, not the Actions bot.
+      # PRs opened by GITHUB_TOKEN trigger the "approve workflows" gate.
+      GH_TOKEN: ${{ secrets.GH_PAT }}
 
     steps:
       - name: Open or skip PR to main
