@@ -62,6 +62,6 @@
     "seed": "bun --env-file .env src/prisma/seed.ts"
   },
   "engines": {
-    "bun": ">=1.0.0"
+    "node": ">=22.0.0"
   }
 }
