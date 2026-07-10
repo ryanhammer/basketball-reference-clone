@@ -147,7 +147,7 @@ jobs:
             2. Address only actionable issues — correctness, type safety, data access patterns, naming conventions. Skip style nits not backed by a rule in CLAUDE.md or .github/copilot-instructions.md.
             3. Make minimal, targeted changes. Do not refactor unrelated code.
             4. Run `bun run typecheck` after making changes and fix any errors introduced.
-            5. If you made changes, commit with message: "chore: address Copilot review feedback [automated by Claude]"
+            5. If you made changes, use the `mcp__github_file_ops__commit_files` MCP tool to commit them with message: "chore: address Copilot review feedback [automated by Claude]". Do NOT use git shell commands (git add / git commit / git push) — they are not available.
             6. ALWAYS post a comment on the PR (using `gh pr comment`) summarising: what was fixed (if anything), what was intentionally skipped and why, and anything that requires manual attention. Do this even if you made no changes.
 
       - name: Run summary
